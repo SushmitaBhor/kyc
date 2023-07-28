@@ -29,36 +29,50 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool check = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: SafeArea(child: completeKYC()));
   }
 
   Widget completeKYC() {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.grey.shade300, spreadRadius: 1, blurRadius: 20),
-          ]),
-      margin: const EdgeInsets.only(top: 40, right: 20, left: 20, bottom: 20),
-      padding: const EdgeInsets.only(top: 40, right: 20, left: 20, bottom: 20),
-      child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            completeKYCTitle(),
-            const SizedBox(
-              height: 10,
+    return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.grey.shade300,
+                        spreadRadius: 1,
+                        blurRadius: 20),
+                  ]),
+              margin:
+                  const EdgeInsets.only(top: 40, right: 20, left: 20, bottom: 20),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    completeKYCTitle(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    whatToKeepHandy(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    whyKYC(),
+                  ]),
             ),
-            whatToKeepHandy(),
-            const SizedBox(
-              height: 10,
-            ),
-            whyKYC()
-          ]),
+            term(),
+
+          ],
+        ),    button()
+      ],
     );
   }
 
@@ -114,7 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0),
             child: Text('What to keep handy?',
-                style: styleText(fontSize: 20.00, fontWeight: FontWeight.w700)),
+                style: styleText(fontSize: 18.00, fontWeight: FontWeight.w700)),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 31.0),
@@ -148,7 +162,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 5.0),
             child: Text('Why do we need KYC?',
-                style: styleText(fontSize: 20.00, fontWeight: FontWeight.w700)),
+                style: styleText(fontSize: 18.00, fontWeight: FontWeight.w700)),
           ),
           bulletedTitle(
               'RBI mandates company verification of customers engaging in cross border payments.'),
@@ -158,26 +172,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget bulletedTitle(title) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 20.0),
-      child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            leadIcon(),
-            const SizedBox(
-              width: 10,
-            ),
-            Expanded(
-                child: Text(
-              title,
-              style: styleText(
-                  fontSize: 14.00,
-                  fontWeight: FontWeight.w100,
-                  color: Colors.black54),
-            )),
-          ]),
-    );
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          leadIcon(),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+              child: Text(
+            title,
+            style: styleText(
+                fontSize: 14.00,
+                fontWeight: FontWeight.w100,
+                color: Colors.black54),
+          )),
+        ]);
   }
 
   Widget leadIcon() {
@@ -190,5 +201,77 @@ class _MyHomePageState extends State<MyHomePage> {
           color: Colors.white,
           size: 15,
         ));
+  }
+
+  term() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.grey.shade300, spreadRadius: 1, blurRadius: 20),
+          ]),
+      child: Row(
+        children: [
+          Checkbox(
+            value: check,
+            onChanged: (val) {
+              setState(
+                () {
+                  check = val!;
+                },
+              );
+            },
+          ),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                  text: 'By clicking the above, I agree with BriskPe ',
+                  style: styleText(
+                      fontSize: 14.00,
+                      fontWeight: FontWeight.w100,
+                      color: Colors.black54),
+                  children: [
+                    TextSpan(
+                        text: 'Terms of Use ',
+                        style: styleText(
+                            fontSize: 14.00,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black54)),
+                    TextSpan(
+                        text: 'and ',
+                        style: styleText(
+                            fontSize: 14.00,
+                            fontWeight: FontWeight.w100,
+                            color: Colors.black54)),
+                    TextSpan(
+                        text: 'Privacy Policy.',
+                        style: styleText(
+                            fontSize: 14.00,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black54))
+                  ]),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+   button() {
+    return Container(width: double.infinity,margin: const EdgeInsets.all(20),
+      child: ElevatedButton(
+        onPressed: () {},
+        style: OutlinedButton.styleFrom(backgroundColor: Colors.deepPurple,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),padding: EdgeInsets.symmetric(vertical: 10)),
+        child: Text(
+          'Agree and Continue',
+          style: styleText(
+              fontSize: 20.00, fontWeight: FontWeight.w600, color: Colors.white),
+        ),
+      ),
+    );
   }
 }
