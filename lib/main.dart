@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kyc/pages/uploadPan.dart';
+
+import 'commomWidget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -76,23 +79,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  TextStyle styleText({color, fontWeight, fontSize}) {
-    return TextStyle(
-        color: color ?? Colors.black,
-        fontSize: fontSize ?? 25.00,
-        fontWeight: fontWeight ?? FontWeight.w400,
-        fontFamily: 'Lato');
-  }
 
-  Decoration decoration() {
-    return BoxDecoration(
-        color: Colors.purple.shade50,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.grey.shade300, spreadRadius: 1, blurRadius: 20),
-        ]);
-  }
+
+
 
   Widget completeKYCTitle() {
     return RichText(
@@ -191,17 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ]);
   }
 
-  Widget leadIcon() {
-    return Container(
-        decoration:
-            const BoxDecoration(shape: BoxShape.circle, color: Colors.purple),
-        padding: const EdgeInsets.all(2),
-        child: const Icon(
-          Icons.done,
-          color: Colors.white,
-          size: 15,
-        ));
-  }
+
 
   term() {
     return Container(
@@ -264,7 +243,9 @@ class _MyHomePageState extends State<MyHomePage> {
    button() {
     return Container(width: double.infinity,margin: const EdgeInsets.all(20),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){return UploadPan();}));
+        },
         style: OutlinedButton.styleFrom(backgroundColor: Colors.deepPurple,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),padding: EdgeInsets.symmetric(vertical: 10)),
         child: Text(
           'Agree and Continue',
