@@ -1,29 +1,22 @@
+import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:casa_vertical_stepper/casa_vertical_stepper.dart';
-import 'package:easy_stepper/easy_stepper.dart';
+import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../commomWidget.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
 class UploadPan extends StatefulWidget {
   const UploadPan({Key? key}) : super(key: key);
 
   @override
   State<UploadPan> createState() => _UploadPanState();
 }
-final stepperList = [
-  StepperStep(
-      title: Text('Uploading file'),
-      leading: Container(decoration:BoxDecoration(shape: BoxShape.circle,border: Border.all(color: Colors.grey)),child: Icon(Icons.done,size: 15,)),trailing: SizedBox(),
-      view: SizedBox()
-  ),
-  StepperStep(
-    title: Text('Extracting data'),
-    leading:Container(decoration:BoxDecoration(shape: BoxShape.circle,border: Border.all(color: Colors.grey)),child: Icon(Icons.done,size: 15,)),trailing: SizedBox.shrink(),
-    view: SizedBox()
-  ), StepperStep(
-      title: Expanded(child: Text('Verifying with government records',style: TextStyle(overflow: TextOverflow.ellipsis),)),
-      leading: Container(decoration:BoxDecoration(shape: BoxShape.circle,border: Border.all(color: Colors.grey)),child: Icon(Icons.done,size: 15,)),trailing: SizedBox(),
-      view: SizedBox()
-  )];
+
+
 
 class _UploadPanState extends State<UploadPan> {
   @override
@@ -33,64 +26,18 @@ class _UploadPanState extends State<UploadPan> {
           appBar: AppBar(
             elevation: 0,
           ),
-          body: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
-              children: [upload(), const SizedBox(height: 10), benefit()],
+          body: SingleChildScrollView(
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              child: Column(
+                children: [upload(), const SizedBox(height: 10), benefit()],
+              ),
             ),
           )),
     );
   }
 
-  int activeStep = 0;
   int activeStepVertical = 0;
-
-  Widget stepI() {
-    return EasyStepper(
-      activeStep: activeStep,
-      showStepBorder: false,
-      steppingEnabled: true,
-      defaultLineColor: Colors.grey,
-      internalPadding: 0,
-      lineType: LineType.normal,
-      padding: const EdgeInsets.only(top: 10),
-      stepRadius: 22,
-      fitWidth: true,
-      activeStepBackgroundColor: Colors.purple,
-      activeStepIconColor: Colors.white,
-      finishedStepBackgroundColor: Colors.grey.shade400,
-      finishedStepIconColor: Colors.grey,
-      unreachedStepBackgroundColor: Colors.grey.shade100,
-      unreachedStepIconColor: Colors.grey,
-      steps: [
-        EasyStep(
-          customStep: Icon(
-            Icons.person,
-            color: activeStep == 0 ? Colors.white : Colors.grey,
-            size: 20,
-          ),
-        ),
-        EasyStep(
-            customStep: Icon(
-          Icons.language,
-          color: activeStep == 1 ? Colors.white : Colors.grey,
-        )),
-        EasyStep(
-          customStep: Icon(
-            Icons.group_outlined,
-            color: activeStep == 2 ? Colors.white : Colors.grey,
-          ),
-        ),
-        EasyStep(
-            customStep: Icon(
-          Icons.account_balance_outlined,
-          color: activeStep == 3 ? Colors.white : Colors.grey,
-        )),
-      ],
-      showLoadingAnimation: false,
-      onStepReached: (index) => setState(() => activeStep = index),
-    );
-  }
 
   Widget upload() {
     return Container(
@@ -117,44 +64,174 @@ class _UploadPanState extends State<UploadPan> {
           ),
           Container(
             decoration: BoxDecoration(
-                color: Colors.purple.shade50.withOpacity(0.10),
+                color: const Color(0xffFEF9FF),
                 borderRadius: BorderRadius.circular(10)),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RichText(
-                  text: TextSpan(
-                      text: 'Upload Soft Copy Of Director\'s Personal ',
-                      style: styleText(
-                          fontWeight: FontWeight.w600, fontSize: 16.0),
-                      children: [
-                        TextSpan(
-                            text: 'PAN Card',
-                            style: styleText(
-                                color: Colors.purple,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16.0))
-                      ]),
-                ),
+                titleAndDescription(),
                 const SizedBox(
                   height: 10,
                 ),
-                Text(
-                    'To complete verification of your business, we require authorisation of one of the companny directors listed with the ministry of corporate affairs (MCA).',
-                style: styleText(fontSize: 14.0,fontWeight: FontWeight.normal,color: Colors.grey),
+                dotBorderBox(),
+                const SizedBox(
+                  height: 10,
                 ),
-                CasaVerticalStepperView(
-                  steps: stepperList,
-                  seperatorColor: const Color(0xffD2D5DF),
-
-                  showStepStatusWidget: false,
-                ),
+                verticalSteps()
               ],
             ),
           )
         ],
       ),
+    );
+  }
+
+  Widget titleAndDescription() {
+    return Column(
+      children: [
+        RichText(
+          text: TextSpan(
+              text: 'Upload Soft Copy Of Director\'s Personal ',
+              style: styleText(fontWeight: FontWeight.w600, fontSize: 16.0),
+              children: [
+                TextSpan(
+                    text: 'PAN Card',
+                    style: styleText(
+                        color: Colors.purple,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16.0))
+              ]),
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text(
+          'To complete verification of your business, we require authorisation of one of the companny directors listed with the ministry of corporate affairs (MCA).',
+          style: styleText(
+              fontSize: 14.0,
+              fontWeight: FontWeight.normal,
+              color: Colors.grey),
+        )
+      ],
+    );
+  }
+
+  Widget dotBorderBox() {
+    return DottedBorder(
+      color: Colors.grey,
+      dashPattern: const [10, 5],
+      strokeCap: StrokeCap.round,
+      borderType: BorderType.RRect,
+      radius: const Radius.circular(16),
+      borderPadding: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Column(
+          children: [
+            SvgPicture.asset(
+              'assets/images/upload.svg',
+              width: 61,
+              height: 61,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text('Upload your Director\'s PAN here',
+                style: styleText(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 14.0,
+                    color: Color(0xff272727))),
+            const SizedBox(
+              height: 10,
+            ),
+            browse(),
+            const SizedBox(
+              height: 10,
+            ),
+            Text('JPG/ PNG / PDF | Max Size: 10 MB',
+                style: styleText(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 12.0,
+                    color: Colors.grey)),
+            const SizedBox(
+              height: 20,
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 20,
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                  Text('Or',
+                      style: styleText(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 14.0,
+                          color: Colors.grey)),
+                  Container(
+                    width: 20,
+                    height: 1,
+                    color: Colors.grey,
+                  ),
+                ]),
+            const SizedBox(
+              height: 10,
+            ),
+             TextButton(
+             child:Text( 'Take Photo',
+              style: TextStyle(
+                fontSize: 16.0,
+                decoration: TextDecoration.underline,
+                color: Color(0xffB212CA),
+                decorationColor: Color(0xffB212CA),
+                decorationThickness: 3,
+                decorationStyle: TextDecorationStyle.solid,
+                fontWeight: FontWeight.w600,
+              )), onPressed: ()  {
+
+             })
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget browse() {
+    return ElevatedButton(
+        style: OutlinedButton.styleFrom(
+            backgroundColor: const Color(0xff461AA3),
+            padding: const EdgeInsets.symmetric(
+              vertical: 11,
+              horizontal: 18,
+            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+        onPressed: ()async {
+          FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+          if (result != null) {
+            File file = File(result.files.single.path.toString());
+          } else {
+            // User canceled the picker
+          }
+        },
+        child: Text(
+          'Browse',
+          style: styleText(
+              color: Colors.white,
+              fontSize: 12.0,
+              fontWeight: FontWeight.normal),
+        ));
+  }
+
+  Widget verticalSteps() {
+    return CasaVerticalStepperView(
+      steps: stepperList,
+      seperatorColor: const Color(0xff707070),
+      showStepStatusWidget: false,
     );
   }
 
@@ -170,10 +247,10 @@ class _UploadPanState extends State<UploadPan> {
           ]),
       child: Column(
         children: [
-          Row(
+          const Row(
             children: [
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: Icon(Icons.lock),
               ),
               Text('Your data is secure and protected')
@@ -196,8 +273,8 @@ class _UploadPanState extends State<UploadPan> {
                   padding: EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       shape: BoxShape.circle, color: Colors.lightGreen.shade50),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
                     child: Icon(
                       Icons.done,
                       size: 15,

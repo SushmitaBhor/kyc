@@ -37,6 +37,13 @@ dependencies:
   cupertino_icons: ^1.0.2
   easy_stepper: ^0.7.3
   casa_vertical_stepper: ^0.0.5
+  dotted_border: ^2.0.0+3
+  flutter_svg: ^2.0.7
+  file_picker: ^5.3.3
+  camera: ^0.10.5+2
+  path_provider: ^2.0.15
+  path: ^1.8.3
+  image_picker: ^1.0.1
 
 
 dev_dependencies:
@@ -62,8 +69,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/images/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
@@ -78,9 +85,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-      - family: Lato
+      - family: Readex_Pro
         fonts:
-            - asset: assets/fonts/Lato/Lato-Regular.ttf
+            - asset: assets/fonts/Readex_Pro/static/ReadexPro-Regular.ttf
 
   #   - family: Trajan Pro
   #     fonts:
