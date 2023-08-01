@@ -6,12 +6,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kyc/pages/takeAPhoto.dart';
 import '../commomWidget.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
-class UploadPan extends StatefulWidget {
-  const UploadPan({Key? key}) : super(key: key);
 
+class UploadPan extends StatefulWidget {
+
+  UploadPan({Key? key,  this.picture}) : super(key: key);
+  XFile? picture;
   @override
   State<UploadPan> createState() => _UploadPanState();
 }
@@ -19,6 +20,8 @@ class UploadPan extends StatefulWidget {
 
 
 class _UploadPanState extends State<UploadPan> {
+  bool isLoad=false;
+  final cameras =  availableCameras(); FilePickerResult? result;late File file;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -27,7 +30,13 @@ class _UploadPanState extends State<UploadPan> {
             elevation: 0,
           ),
           body: SingleChildScrollView(
-            child: Container(
+            child: Container(width: double.maxFinite,
+              height: double.maxFinite,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xffFFFFFF),Color(0xffF8C7FF), ],
+                ),
+              ),
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
                 children: [upload(), const SizedBox(height: 10), benefit()],
@@ -70,13 +79,18 @@ class _UploadPanState extends State<UploadPan> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                titleAndDescription(),
-                const SizedBox(
-                  height: 10,
-                ),
-                dotBorderBox(),
-                const SizedBox(
-                  height: 10,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Column(children: [
+                    titleAndDescription(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    dotBorderBox(),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],),
                 ),
                 verticalSteps()
               ],
@@ -126,79 +140,117 @@ class _UploadPanState extends State<UploadPan> {
       radius: const Radius.circular(16),
       borderPadding: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Column(
-          children: [
-            SvgPicture.asset(
-              'assets/images/upload.svg',
-              width: 61,
-              height: 61,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Text('Upload your Director\'s PAN here',
-                style: styleText(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 14.0,
-                    color: Color(0xff272727))),
-            const SizedBox(
-              height: 10,
-            ),
-            browse(),
-            const SizedBox(
-              height: 10,
-            ),
-            Text('JPG/ PNG / PDF | Max Size: 10 MB',
-                style: styleText(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 12.0,
-                    color: Colors.grey)),
-            const SizedBox(
-              height: 20,
-            ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 20,
-                    height: 1,
-                    color: Colors.grey,
-                  ),
-                  Text('Or',
-                      style: styleText(
-                          fontWeight: FontWeight.normal,
-                          fontSize: 14.0,
-                          color: Colors.grey)),
-                  Container(
-                    width: 20,
-                    height: 1,
-                    color: Colors.grey,
-                  ),
-                ]),
-            const SizedBox(
-              height: 10,
-            ),
-             TextButton(
-             child:Text( 'Take Photo',
-              style: TextStyle(
-                fontSize: 16.0,
-                decoration: TextDecoration.underline,
-                color: Color(0xffB212CA),
-                decorationColor: Color(0xffB212CA),
-                decorationThickness: 3,
-                decorationStyle: TextDecorationStyle.solid,
-                fontWeight: FontWeight.w600,
-              )), onPressed: ()  {
-
-             })
-          ],
-        ),
+        padding: const EdgeInsets.symmetric(vertical: 14.0),
+        child:   widget.picture!=null? isLoad==true ? CircularProgressIndicator():preview(): uploadOrTakePhoto() ,
       ),
     );
   }
+Widget preview(){
+    return Column(
+      children: [
+        const Text('Image Preview',style: TextStyle(color: Color(0xff272727),fontSize: 12,fontWeight: FontWeight.w300),),
+        const SizedBox(height: 7,),
+        Container(decoration:BoxDecoration(borderRadius: BorderRadius.circular(16)),child:result==null?Image.file(File( widget.picture!.path), fit: BoxFit.cover, width: 281,height: 170,):Image.file(File(file.path))),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 60),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(onPressed: (){
+               setState(() {
+                 widget.picture=null;
+                 result=null;
+               });
+              }, child: Text('Remove',style:TextStyle(fontSize: 12,color: Color(0xff461AA3)),)),
+              OutlinedButton(onPressed:   () async {
+                await availableCameras().then((value) => Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => TakeAPhoto(cameras: value))));}
 
+
+                  , child: const Text('Change',style:TextStyle(fontSize: 12,color: Color(0xff461AA3)),),style:  OutlinedButton.styleFrom(backgroundColor: Colors.transparent,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5),side: BorderSide(color: Color(0xff461AA3))))
+              ) ],),
+        )
+      ],
+    );
+}
+Widget uploadOrTakePhoto(){
+    return Column(
+      children: [
+        SvgPicture.asset(
+          'assets/images/upload.svg',
+          width: 61,
+          height: 61,
+        ),
+        const SizedBox(
+          height: 10,
+        ),
+        Text('Upload your Director\'s PAN here',
+            style: styleText(
+                fontWeight: FontWeight.normal,
+                fontSize: 14.0,
+                color: Color(0xff272727))),
+        const SizedBox(
+          height: 10,
+        ),
+        browse(),
+        const SizedBox(
+          height: 10,
+        ),
+        Text('JPG/ PNG / PDF | Max Size: 10 MB',
+            style: styleText(
+                fontWeight: FontWeight.normal,
+                fontSize: 12.0,
+                color: Colors.grey)),
+        const SizedBox(
+          height: 20,
+        ),
+        Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: 20,
+                height: 1,
+                color: Colors.grey,
+              ),
+              Text('Or',
+                  style: styleText(
+                      fontWeight: FontWeight.normal,
+                      fontSize: 14.0,
+                      color: Colors.grey)),
+              Container(
+                width: 20,
+                height: 1,
+                color: Colors.grey,
+              ),
+            ]),
+        const SizedBox(
+          height: 10,
+        ),
+        TextButton(
+            child:const Text( 'Take Photo',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  decoration: TextDecoration.underline,
+                  color: Color(0xffB212CA),
+                  decorationColor: Color(0xffB212CA),
+                  decorationThickness: 3,
+                  decorationStyle: TextDecorationStyle.solid,
+                  fontWeight: FontWeight.w600,
+                )),
+            onPressed:      () async {
+              setState(() {
+
+              });
+              await availableCameras().then((value) => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => TakeAPhoto(cameras: value))));
+
+
+            }),
+
+      ],
+    );
+}
   Widget browse() {
     return ElevatedButton(
         style: OutlinedButton.styleFrom(
@@ -210,10 +262,16 @@ class _UploadPanState extends State<UploadPan> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
         onPressed: ()async {
-          FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+          setState(() {
+            isLoad=true;
+          });
+          result = await FilePicker.platform.pickFiles();
 
           if (result != null) {
-            File file = File(result.files.single.path.toString());
+             file = File(result!.files.single.path.toString());  setState(() {
+               isLoad=false;
+             });
           } else {
             // User canceled the picker
           }
@@ -247,13 +305,13 @@ class _UploadPanState extends State<UploadPan> {
           ]),
       child: Column(
         children: [
-          const Row(
+           Row(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Icon(Icons.lock),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: SvgPicture.asset('assets/images/secure.svg'),
               ),
-              Text('Your data is secure and protected')
+              const Text('Your data is secure and protected',style: TextStyle(color: Color(0xff666666),fontSize: 14),)
             ],
           ),
           const SizedBox(
@@ -270,17 +328,14 @@ class _UploadPanState extends State<UploadPan> {
           Row(
             children: [
               Container(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       shape: BoxShape.circle, color: Colors.lightGreen.shade50),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Icon(
-                      Icons.done,
-                      size: 15,
-                    ),
+                  child:  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: SvgPicture.asset('assets/images/tick.svg'),
                   )),
-              Text('KYC compliant with RBI regullations')
+              const Text('KYC compliant with RBI regulations',style: TextStyle(color: Color(0xff666666),fontSize: 14),)
             ],
           ),
         ],

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
+  <g id="tick" transform="translate(4.446 3.446)">
+    <circle id="Ellipse_33" data-name="Ellipse 33" cx="15" cy="15" r="15" transform="translate(-4.446 -3.446)" fill="#ebfff4"/>
+    <path id="check" d="M21.252,6,9.391,16.486,4,11.72" transform="translate(-1.848 0.311)" fill="none" stroke="#08ac72" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+  </g>
+</svg>

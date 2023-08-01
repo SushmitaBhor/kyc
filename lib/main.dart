@@ -3,8 +3,8 @@ import 'package:kyc/pages/uploadPan.dart';
 
 import 'commomWidget.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -39,43 +39,51 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget completeKYC() {
-    return Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.shade300,
-                        spreadRadius: 1,
-                        blurRadius: 20),
-                  ]),
-              margin:
-                  const EdgeInsets.only(top: 40, right: 20, left: 20, bottom: 20),
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    completeKYCTitle(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    whatToKeepHandy(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    whyKYC(),
-                  ]),
-            ),
-            term(),
+    return Container(width: double.maxFinite,
+      height: double.maxFinite,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xffFFFFFF),Color(0xffF8C7FF), ],
+        ),
+      ),
+      child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.grey.shade300,
+                          spreadRadius: 1,
+                          blurRadius: 20),
+                    ]),
+                margin:
+                    const EdgeInsets.only(top: 40, right: 20, left: 20, bottom: 20),
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      completeKYCTitle(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      whatToKeepHandy(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      whyKYC(),
+                    ]),
+              ),
+              term(),
 
-          ],
-        ),    button()
-      ],
+            ],
+          ),    button()
+        ],
+      ),
     );
   }
 
@@ -206,33 +214,36 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
           Expanded(
-            child: RichText(
-              text: TextSpan(
-                  text: 'By clicking the above, I agree with BriskPe ',
-                  style: styleText(
-                      fontSize: 14.00,
-                      fontWeight: FontWeight.w100,
-                      color: Colors.black54),
-                  children: [
-                    TextSpan(
-                        text: 'Terms of Use ',
-                        style: styleText(
-                            fontSize: 14.00,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black54)),
-                    TextSpan(
-                        text: 'and ',
-                        style: styleText(
-                            fontSize: 14.00,
-                            fontWeight: FontWeight.w100,
-                            color: Colors.black54)),
-                    TextSpan(
-                        text: 'Privacy Policy.',
-                        style: styleText(
-                            fontSize: 14.00,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black54))
-                  ]),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 23.0),
+              child: RichText(
+                text: TextSpan(
+                    text: 'By clicking the above, I agree with BriskPe ',
+                    style: styleText(
+                        fontSize: 14.00,
+                        fontWeight: FontWeight.w100,
+                        color: Colors.black54),
+                    children: [
+                      TextSpan(
+                          text: 'Terms of Use ',
+                          style: styleText(
+                              fontSize: 14.00,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black54)),
+                      TextSpan(
+                          text: 'and ',
+                          style: styleText(
+                              fontSize: 14.00,
+                              fontWeight: FontWeight.w100,
+                              color: Colors.black54)),
+                      TextSpan(
+                          text: 'Privacy Policy.',
+                          style: styleText(
+                              fontSize: 14.00,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.black54))
+                    ]),
+              ),
             ),
           ),
         ],
