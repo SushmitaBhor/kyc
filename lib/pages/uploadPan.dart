@@ -10,18 +10,18 @@ import 'package:kyc/pages/takeAPhoto.dart';
 import '../commomWidget.dart';
 
 class UploadPan extends StatefulWidget {
-
-  UploadPan({Key? key,  this.picture}) : super(key: key);
+  UploadPan({Key? key, this.picture}) : super(key: key);
   XFile? picture;
   @override
   State<UploadPan> createState() => _UploadPanState();
 }
 
-
-
 class _UploadPanState extends State<UploadPan> {
-  bool isLoad=false;
-  final cameras =  availableCameras(); FilePickerResult? result;late File file;
+  bool isLoad = false;
+  bool isBrowse = false;
+  final cameras = availableCameras();
+  FilePickerResult? result;
+  late File file;
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -30,11 +30,15 @@ class _UploadPanState extends State<UploadPan> {
             elevation: 0,
           ),
           body: SingleChildScrollView(
-            child: Container(width: double.maxFinite,
+            child: Container(
+              width: double.maxFinite,
               height: double.maxFinite,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xffFFFFFF),Color(0xffF8C7FF), ],
+                  colors: [
+                    Color(0xffFFFFFF),
+                    Color(0xffF8C7FF),
+                  ],
                 ),
               ),
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -47,7 +51,33 @@ class _UploadPanState extends State<UploadPan> {
   }
 
   int activeStepVertical = 0;
+browseImage () async { setState(() {});
+result = await FilePicker.platform
+    .pickFiles(type: FileType.image, allowMultiple: false);
 
+if (result != null) {
+  file = File(result!.files.single.path.toString());
+  setState(() {
+    setState(() {
+      isLoad = true;
+    });
+    setState(() {
+      isBrowse = true;
+    });
+  });
+} else {
+  // User canceled the picker
+  setState(() {
+    isLoad = false;
+  });
+}
+}
+openCamera () async {
+  await availableCameras().then((value) => Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (_) => TakeAPhoto(cameras: value))));
+}
   Widget upload() {
     return Container(
       decoration: BoxDecoration(
@@ -81,16 +111,18 @@ class _UploadPanState extends State<UploadPan> {
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Column(children: [
-                    titleAndDescription(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    dotBorderBox(),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                  ],),
+                  child: Column(
+                    children: [
+                      titleAndDescription(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      isBrowse == true ? dotBorderBoxBrowse() : dotBorderBox(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                    ],
+                  ),
                 ),
                 verticalSteps()
               ],
@@ -141,39 +173,150 @@ class _UploadPanState extends State<UploadPan> {
       borderPadding: EdgeInsets.zero,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 14.0),
-        child:   widget.picture!=null? isLoad==true ? CircularProgressIndicator():preview(): uploadOrTakePhoto() ,
+        child: widget.picture != null ? preview() : uploadOrTakePhoto(),
       ),
     );
   }
-Widget preview(){
+
+  Widget dotBorderBoxBrowse() {
+    return DottedBorder(
+      color: Colors.grey,
+      dashPattern: const [10, 5],
+      strokeCap: StrokeCap.round,
+      borderType: BorderType.RRect,
+      radius: const Radius.circular(16),
+      borderPadding: EdgeInsets.zero,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 14.0),
+        child: result != null
+            ? isLoad == true
+                ? browsePreview()
+                : const CircularProgressIndicator()
+            : uploadOrTakePhoto(),
+      ),
+    );
+  }
+
+  Widget preview() {
     return Column(
       children: [
-        const Text('Image Preview',style: TextStyle(color: Color(0xff272727),fontSize: 12,fontWeight: FontWeight.w300),),
-        const SizedBox(height: 7,),
-        Container(decoration:BoxDecoration(borderRadius: BorderRadius.circular(16)),child:result==null?Image.file(File( widget.picture!.path), fit: BoxFit.cover, width: 281,height: 170,):Image.file(File(file.path))),
+        const Text(
+          'Image Preview',
+          style: TextStyle(
+              color: Color(0xff272727),
+              fontSize: 12,
+              fontWeight: FontWeight.w300),
+        ),
+        const SizedBox(
+          height: 7,
+        ),
+        Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+            child: result == null
+                ? Image.file(
+                    File(widget.picture!.path),
+                    fit: BoxFit.cover,
+                    width: 281,
+                    height: 170,
+                  )
+                : Image.file(File(file.path))),
         Container(
           padding: EdgeInsets.symmetric(horizontal: 60),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(onPressed: (){
-               setState(() {
-                 widget.picture=null;
-                 result=null;
-               });
-              }, child: Text('Remove',style:TextStyle(fontSize: 12,color: Color(0xff461AA3)),)),
-              OutlinedButton(onPressed:   () async {
-                await availableCameras().then((value) => Navigator.push(context,
-                    MaterialPageRoute(builder: (_) => TakeAPhoto(cameras: value))));}
-
-
-                  , child: const Text('Change',style:TextStyle(fontSize: 12,color: Color(0xff461AA3)),),style:  OutlinedButton.styleFrom(backgroundColor: Colors.transparent,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5),side: BorderSide(color: Color(0xff461AA3))))
-              ) ],),
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.picture = null;
+                      result = null;
+                    });
+                  },
+                  child: const Text(
+                    'Remove',
+                    style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
+                  )),
+              OutlinedButton(
+                  onPressed: () async {
+                    if(result==null){openCamera();}else{browseImage();}
+                  },
+                  style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          side: const BorderSide(color: Color(0xff461AA3)))),
+                  child: const Text(
+                    'Change',
+                    style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
+                  ))
+            ],
+          ),
         )
       ],
     );
-}
-Widget uploadOrTakePhoto(){
+  }
+
+  Widget browsePreview() {
+    return Column(
+      children: [
+        const Text(
+          'Image Preview',
+          style: TextStyle(
+              color: Color(0xff272727),
+              fontSize: 12,
+              fontWeight: FontWeight.w300),
+        ),
+        const SizedBox(
+          height: 7,
+        ),
+        Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
+            child: result == null
+                ? Image.file(
+                    File(file.path),
+                    fit: BoxFit.cover,
+                    width: 281,
+                    height: 170,
+                  )
+                : Image.file(File(file.path))),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 60),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton(
+                  onPressed: () {
+                    setState(() {
+                      widget.picture = null;
+                      result = null;
+                    });
+                  },
+                  child: Text(
+                    'Remove',
+                    style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
+                  )),
+              OutlinedButton(
+                  onPressed: () async {
+                    if(result==null){openCamera();}else{browseImage();}
+
+                  },
+                  child: const Text(
+                    'Change',
+                    style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          side: BorderSide(color: Color(0xff461AA3)))))
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget uploadOrTakePhoto() {
     return Column(
       children: [
         SvgPicture.asset(
@@ -228,7 +371,7 @@ Widget uploadOrTakePhoto(){
           height: 10,
         ),
         TextButton(
-            child:const Text( 'Take Photo',
+            child: const Text('Take Photo',
                 style: TextStyle(
                   fontSize: 16.0,
                   decoration: TextDecoration.underline,
@@ -238,19 +381,17 @@ Widget uploadOrTakePhoto(){
                   decorationStyle: TextDecorationStyle.solid,
                   fontWeight: FontWeight.w600,
                 )),
-            onPressed:      () async {
-              setState(() {
-
-              });
-              await availableCameras().then((value) => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => TakeAPhoto(cameras: value))));
-
-
+            onPressed: () async {
+              setState(() {});
+              await availableCameras().then((value) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => TakeAPhoto(cameras: value))));
             }),
-
       ],
     );
-}
+  }
+
   Widget browse() {
     return ElevatedButton(
         style: OutlinedButton.styleFrom(
@@ -261,19 +402,25 @@ Widget uploadOrTakePhoto(){
             ),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
-        onPressed: ()async {
-
-          setState(() {
-            isLoad=true;
-          });
-          result = await FilePicker.platform.pickFiles();
+        onPressed: () async { setState(() {});
+          result = await FilePicker.platform
+              .pickFiles(type: FileType.image, allowMultiple: false);
 
           if (result != null) {
-             file = File(result!.files.single.path.toString());  setState(() {
-               isLoad=false;
-             });
+            file = File(result!.files.single.path.toString());
+            setState(() {
+              setState(() {
+                isLoad = true;
+              });
+              setState(() {
+                isBrowse = true;
+              });
+            });
           } else {
             // User canceled the picker
+            setState(() {
+              isLoad = false;
+            });
           }
         },
         child: Text(
@@ -305,13 +452,16 @@ Widget uploadOrTakePhoto(){
           ]),
       child: Column(
         children: [
-           Row(
+          Row(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: SvgPicture.asset('assets/images/secure.svg'),
               ),
-              const Text('Your data is secure and protected',style: TextStyle(color: Color(0xff666666),fontSize: 14),)
+              const Text(
+                'Your data is secure and protected',
+                style: TextStyle(color: Color(0xff666666), fontSize: 14),
+              )
             ],
           ),
           const SizedBox(
@@ -331,11 +481,14 @@ Widget uploadOrTakePhoto(){
                   padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                       shape: BoxShape.circle, color: Colors.lightGreen.shade50),
-                  child:  Padding(
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SvgPicture.asset('assets/images/tick.svg'),
+                    child: SvgPicture.asset('assets/images/tick.svg'),
                   )),
-              const Text('KYC compliant with RBI regulations',style: TextStyle(color: Color(0xff666666),fontSize: 14),)
+              const Text(
+                'KYC compliant with RBI regulations',
+                style: TextStyle(color: Color(0xff666666), fontSize: 14),
+              )
             ],
           ),
         ],
