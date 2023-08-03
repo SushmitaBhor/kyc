@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kyc/pages/takeAPhoto.dart';
+import 'package:pinput/pinput.dart';
 import '../commomWidget.dart';
 
 class UploadPan extends StatefulWidget {
@@ -17,8 +18,22 @@ class UploadPan extends StatefulWidget {
 }
 
 class _UploadPanState extends State<UploadPan> {
+  final defaultPinTheme = PinTheme(
+    width: 56,
+    height: 56,
+    textStyle: TextStyle(fontSize: 20, color: Color.fromRGBO(30, 60, 87, 1), fontWeight: FontWeight.w600),
+    decoration: BoxDecoration(
+      border: Border(bottom:BorderSide(
+        color: Colors.black,
+        width: 3.0,
+      ),),
+      borderRadius: BorderRadius.circular(20),
+    ),
+  );
   bool isLoad = false;
   bool isBrowse = false;
+  bool uploadButtonClick = false;
+  bool verifyAdhar = false;
   final cameras = availableCameras();
   FilePickerResult? result;
   late File file;
@@ -43,43 +58,215 @@ class _UploadPanState extends State<UploadPan> {
               ),
               margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
-                children: [upload(), const SizedBox(height: 10), benefit()],
+                children: [
+                  upload(),
+                  const SizedBox(height: 30),
+                  uploadButtonClick == true
+                      ? SizedBox(
+                          width: double.maxFinite, child: verifyAadhaarButton())
+                      : const SizedBox.shrink(),
+                  isLoad == true || widget.picture != null
+                      ? uploadButtonClick == true
+                          ? const SizedBox.shrink()
+                          : SizedBox(
+                              width: double.maxFinite,
+                              child: uploadPan(),
+                            )
+                      : benefit()
+                ],
               ),
             ),
           )),
     );
   }
 
-  int activeStepVertical = 0;
-browseImage () async { setState(() {});
-result = await FilePicker.platform
-    .pickFiles(type: FileType.image, allowMultiple: false);
+  enterOtpBottomSheet() {
+    return showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              width: double.infinity,
+              child: Column(
+                children: [
+                  SvgPicture.asset(
+                    'assets/images/enterOtpIcon.svg',
+                    height: 75,
+                    width: 75,
+                  ),
+                  const SizedBox(height: 29),
+                  Text('Enter OTP'),
+                  const SizedBox(height: 11),
+                  Container(
+                    width: 52,
+                    height: 2,
+                    color: Color(0xffB212CA),
+                  ),
+                  const SizedBox(height: 60),
+                  RichText(
+                    text: const TextSpan(
+                        text:
+                            'Enter OTP Sent To Your Aadhaar Linked',
+                        style: TextStyle(fontSize: 18,color: Color(0xff272727)),
+                        children: [
+                          TextSpan(
+                              text: ' Mobile Number',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w600,color: Color(0xff272727)))
+                        ]),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 19),
 
-if (result != null) {
-  file = File(result!.files.single.path.toString());
-  setState(() {
-    setState(() {
-      isLoad = true;
-    });
-    setState(() {
-      isBrowse = true;
-    });
-  });
-} else {
-  // User canceled the picker
-  setState(() {
-    isLoad = false;
-  });
-}
-}
-openCamera () async {
-  await availableCameras().then((value) => Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (_) => TakeAPhoto(cameras: value))));
-}
+                ],
+              ));
+        });
+  }
+
+  ElevatedButton verifyAadhaarButton() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          verifyAdhar = true;
+        });
+        enterOtpBottomSheet();
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Verify Aadhaar",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton uploadPan() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          uploadButtonClick = true;
+        });
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Upload",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+
+  form() {
+    return Form(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('PAN',
+            style: styleText(
+                color: const Color(0xff272727),
+                fontSize: 16.0,
+                fontWeight: FontWeight.w300)),
+        const SizedBox(height: 8),
+        TextFormField(
+          decoration: const InputDecoration(
+              fillColor: Color(0xffFBEEFE),
+              filled: true,
+              hintText: 'BA34V F7K90',
+              hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18)),
+        ),
+        const SizedBox(height: 24),
+        Text('Full Name',
+            style: styleText(
+                color: const Color(0xff272727),
+                fontSize: 16.0,
+                fontWeight: FontWeight.w300)),
+        const SizedBox(height: 8),
+        TextFormField(
+          decoration: const InputDecoration(
+              fillColor: Color(0xffFBEEFE),
+              filled: true,
+              hintText: 'HEMANT KUMAR GHIYA',
+              hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18)),
+        ),
+        const SizedBox(height: 24),
+        Text('How Can We Address You?',
+            style: styleText(
+                color: const Color(0xff272727),
+                fontSize: 16.0,
+                fontWeight: FontWeight.w300)),
+        const SizedBox(height: 8),
+        TextFormField(
+          decoration: InputDecoration(
+              fillColor: const Color(0xffFBEEFE),
+              filled: true,
+              hintText: 'Hemant Kumar',
+              hintStyle:
+                  styleText(fontSize: 18.0, color: const Color(0xff272727))),
+        ),
+        const SizedBox(height: 24),
+        Text('Aadhaar Card',
+            style: styleText(
+                color: const Color(0xff272727),
+                fontSize: 16.0,
+                fontWeight: FontWeight.w300)),
+        TextFormField(
+          decoration: InputDecoration(
+              fillColor: const Color(0xffFBEEFE),
+              filled: true,
+              hintText: '1234 5678 9012',
+              hintStyle:
+                  styleText(fontSize: 18.0, color: const Color(0xff272727))),
+        ),
+      ]),
+    );
+  }
+
+  int activeStepVertical = 0;
+  browseImage() async {
+    setState(() {});
+    result = await FilePicker.platform
+        .pickFiles(type: FileType.image, allowMultiple: false);
+
+    if (result != null) {
+      file = File(result!.files.single.path.toString());
+      setState(() {
+        setState(() {
+          isLoad = true;
+        });
+        setState(() {
+          isBrowse = true;
+        });
+      });
+    } else {
+      // User canceled the picker
+      setState(() {
+        isLoad = false;
+      });
+    }
+  }
+
+  openCamera() async {
+    await availableCameras().then((value) => Navigator.push(context,
+        MaterialPageRoute(builder: (_) => TakeAPhoto(cameras: value))));
+  }
+
   Widget upload() {
     return Container(
+      padding: EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -124,10 +311,47 @@ openCamera () async {
                     ],
                   ),
                 ),
-                verticalSteps()
+                isLoad == true || widget.picture != null
+                    ? uploadButtonClick == true
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'To upload a different PAN',
+                                textAlign: TextAlign.left,
+                                style: styleText(
+                                    fontWeight: FontWeight.w300,
+                                    fontSize: 16.0,
+                                    color: const Color(0xff272727)),
+                              ),
+                              TextButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      uploadButtonClick = false;
+                                    });
+                                  },
+                                  child: const Text(
+                                    'Click here',
+                                    style: TextStyle(
+                                        color: Color(0xffB212CA),
+                                        fontSize: 16.0,
+                                        fontWeight: FontWeight.w600,
+                                        decoration: TextDecoration.underline),
+                                  )),
+                            ],
+                          )
+                        : const SizedBox.shrink()
+                    : verticalSteps()
               ],
             ),
-          )
+          ),
+          uploadButtonClick == true
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 8.0),
+                  child: form(),
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );
@@ -171,10 +395,19 @@ openCamera () async {
       borderType: BorderType.RRect,
       radius: const Radius.circular(16),
       borderPadding: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14.0),
-        child: widget.picture != null ? preview() : uploadOrTakePhoto(),
-      ),
+      child: uploadButtonClick == true
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.file(
+                File(widget.picture!.path),
+                fit: BoxFit.cover,
+                width: 281,
+                height: 170,
+              ))
+          : Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14.0),
+              child: widget.picture != null ? preview() : uploadOrTakePhoto(),
+            ),
     );
   }
 
@@ -186,14 +419,25 @@ openCamera () async {
       borderType: BorderType.RRect,
       radius: const Radius.circular(16),
       borderPadding: EdgeInsets.zero,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14.0),
-        child: result != null
-            ? isLoad == true
-                ? browsePreview()
-                : const CircularProgressIndicator()
-            : uploadOrTakePhoto(),
-      ),
+      child: uploadButtonClick == true
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: Image.file(
+                File(file.path),
+                fit: BoxFit.cover,
+                width: 281,
+                height: 170,
+              ))
+          : Padding(
+              padding: const EdgeInsets.symmetric(
+                vertical: 14.0,
+              ),
+              child: result != null
+                  ? isLoad == true
+                      ? browsePreview()
+                      : const CircularProgressIndicator()
+                  : uploadOrTakePhoto(),
+            ),
     );
   }
 
@@ -210,18 +454,16 @@ openCamera () async {
         const SizedBox(
           height: 7,
         ),
+        ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.file(
+              File(widget.picture!.path),
+              fit: BoxFit.cover,
+              width: 281,
+              height: 170,
+            )),
         Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-            child: result == null
-                ? Image.file(
-                    File(widget.picture!.path),
-                    fit: BoxFit.cover,
-                    width: 281,
-                    height: 170,
-                  )
-                : Image.file(File(file.path))),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 60),
+          padding: const EdgeInsets.symmetric(horizontal: 60),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -238,7 +480,11 @@ openCamera () async {
                   )),
               OutlinedButton(
                   onPressed: () async {
-                    if(result==null){openCamera();}else{browseImage();}
+                    if (result == null) {
+                      openCamera();
+                    } else {
+                      browseImage();
+                    }
                   },
                   style: OutlinedButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -269,18 +515,16 @@ openCamera () async {
         const SizedBox(
           height: 7,
         ),
-        Container(
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
-            child: result == null
-                ? Image.file(
-                    File(file.path),
-                    fit: BoxFit.cover,
-                    width: 281,
-                    height: 170,
-                  )
-                : Image.file(File(file.path))),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 60),
+        ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.file(
+              File(file.path),
+              fit: BoxFit.cover,
+              width: 281,
+              height: 170,
+            )),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 60),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -297,8 +541,11 @@ openCamera () async {
                   )),
               OutlinedButton(
                   onPressed: () async {
-                    if(result==null){openCamera();}else{browseImage();}
-
+                    if (result == null) {
+                      openCamera();
+                    } else {
+                      browseImage();
+                    }
                   },
                   child: const Text(
                     'Change',
@@ -402,7 +649,8 @@ openCamera () async {
             ),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
-        onPressed: () async { setState(() {});
+        onPressed: () async {
+          setState(() {});
           result = await FilePicker.platform
               .pickFiles(type: FileType.image, allowMultiple: false);
 
