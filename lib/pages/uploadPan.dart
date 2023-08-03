@@ -38,6 +38,7 @@ class _UploadPanState extends State<UploadPan>
   bool isBrowse = false;
   bool uploadButtonClick = false;
   bool verifyAadhaar = false;
+  bool verifyGSTIN = false;
   final cameras = availableCameras();
   FilePickerResult? result;
   late File file;
@@ -68,7 +69,7 @@ class _UploadPanState extends State<UploadPan>
                   uploadButtonClick == true
                       ? SizedBox(
                           width: double.maxFinite, child: verifyAadhaarButton())
-                      : const SizedBox.shrink(),
+                      :activeStep==1? verifyGSTINButton(): const SizedBox.shrink(),
                   isLoad == true || widget.picture != null
                       ? uploadButtonClick == true
                           ? const SizedBox.shrink()
@@ -220,6 +221,30 @@ resendOtpCounter(){
         });
         _controller.start();
         enterOtpBottomSheet();
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Verify Aadhaar",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+  ElevatedButton verifyGSTINButton() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          verifyGSTIN = true;
+        });
+
       },
       style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xff461AA3),
