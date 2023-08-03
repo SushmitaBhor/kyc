@@ -2,7 +2,10 @@ import 'package:casa_vertical_stepper/casa_vertical_stepper.dart';
 import 'package:easy_stepper/easy_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-int activeStep = 0;
+int
+
+activeStep = 0;
+ GlobalKey<FormState> gstinFormKey=GlobalKey<FormState>();
 final stepperList = [
   StepperStep(
       title: const Text(

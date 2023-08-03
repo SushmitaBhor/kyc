@@ -5,10 +5,11 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pin_code_fields/flutter_pin_code_fields.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kyc/pages/takeAPhoto.dart';
-import 'package:pinput/pinput.dart';
 import '../commomWidget.dart';
+import 'package:custom_timer/custom_timer.dart';
 
 class UploadPan extends StatefulWidget {
   UploadPan({Key? key, this.picture}) : super(key: key);
@@ -17,23 +18,26 @@ class UploadPan extends StatefulWidget {
   State<UploadPan> createState() => _UploadPanState();
 }
 
-class _UploadPanState extends State<UploadPan> {
-  final defaultPinTheme = PinTheme(
-    width: 56,
-    height: 56,
-    textStyle: TextStyle(fontSize: 20, color: Color.fromRGBO(30, 60, 87, 1), fontWeight: FontWeight.w600),
-    decoration: BoxDecoration(
-      border: Border(bottom:BorderSide(
-        color: Colors.black,
-        width: 3.0,
-      ),),
-      borderRadius: BorderRadius.circular(20),
-    ),
-  );
+class _UploadPanState extends State<UploadPan>
+    with SingleTickerProviderStateMixin {
+  late final CustomTimerController _controller = CustomTimerController(
+      vsync: this,
+      begin: const Duration(seconds: 30),
+      end: const Duration(seconds: 0),
+      initialState: CustomTimerState.reset,
+      interval: CustomTimerInterval.seconds);
+
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   bool isLoad = false;
   bool isBrowse = false;
   bool uploadButtonClick = false;
-  bool verifyAdhar = false;
+  bool verifyAadhaar = false;
   final cameras = availableCameras();
   FilePickerResult? result;
   late File file;
@@ -83,52 +87,138 @@ class _UploadPanState extends State<UploadPan> {
   enterOtpBottomSheet() {
     return showModalBottomSheet(
         context: context,
+        backgroundColor: Color(0xffFFFFFF),
         builder: (BuildContext context) {
-          return Container(
-              padding: EdgeInsets.symmetric(vertical: 40),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  SvgPicture.asset(
-                    'assets/images/enterOtpIcon.svg',
-                    height: 75,
-                    width: 75,
-                  ),
-                  const SizedBox(height: 29),
-                  Text('Enter OTP'),
-                  const SizedBox(height: 11),
-                  Container(
-                    width: 52,
-                    height: 2,
-                    color: Color(0xffB212CA),
-                  ),
-                  const SizedBox(height: 60),
-                  RichText(
-                    text: const TextSpan(
-                        text:
-                            'Enter OTP Sent To Your Aadhaar Linked',
-                        style: TextStyle(fontSize: 18,color: Color(0xff272727)),
+          return SingleChildScrollView(
+            child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    SvgPicture.asset(
+                      'assets/images/enterOtpIcon.svg',
+                      height: 75,
+                      width: 75,
+                    ),
+                    const SizedBox(height: 29),
+                    Text(
+                      'Enter OTP',
+                      style: styleText(
+                          fontWeight: FontWeight.w600, fontSize: 28.0),
+                    ),
+                    const SizedBox(height: 11),
+                    Container(
+                      width: 52,
+                      height: 2,
+                      color: const Color(0xffB212CA),
+                    ),
+                    const SizedBox(height: 60),
+                    RichText(
+                      text: const TextSpan(
+                          text: 'Enter OTP Sent To Your Aadhaar Linked',
+                          style: TextStyle(
+                              fontSize: 18.0, color: Color(0xff272727)),
+                          children: [
+                            TextSpan(
+                                text: ' Mobile Number',
+                                style: TextStyle(
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xff272727)))
+                          ]),
+                      textAlign: TextAlign.center,
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 19),
+                        child: PinCodeFields(
+                          onComplete: (String value) {},
+                          borderColor: const Color(0xff666666),
+                          fieldBorderStyle: FieldBorderStyle.bottom,
+                          fieldWidth: 48,
+                          fieldHeight: 45,
+                          fieldBackgroundColor: const Color(0xffFBEEFE),
+                          length: 6,
+                        )),
+                    resendOtpCounter(),
+                    const SizedBox(height: 18),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          TextSpan(
-                              text: ' Mobile Number',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w600,color: Color(0xff272727)))
-                        ]),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 19),
-
-                ],
-              ));
+                      Text(
+                        'Wrong Aadhaar Number? ',
+                        style: styleText(
+                            fontWeight: FontWeight.w300, fontSize: 16.0),
+                      ),
+                      TextButton(
+                          onPressed: () {},
+                          child: const Text(
+                            'Edit',
+                            style: TextStyle(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 16.0,
+                                color: Color(0xffB212CA),
+                                decoration: TextDecoration.underline,
+                                decorationColor: Color(0xffB212CA),
+                                fontFamily: 'Readex_Pro'),
+                          ))
+                    ]),
+                    const SizedBox(height: 48),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: SizedBox(width:double.maxFinite,child: confirmAndContinueButton()),
+                    ),
+                    const SizedBox(height: 43),
+                  ],
+                )),
+          );
         });
   }
-
+resendOtpCounter(){
+    return Padding(
+      padding: const EdgeInsets.only(right: 18.0),
+      child: CustomTimer(
+          controller: _controller,
+          builder: (state, remaining) {
+            return Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      _controller.reset();
+                      _controller.start();
+                    },
+                    child: const Text("Resend OTP",
+                        style: TextStyle(
+                            fontSize: 14.0,
+                            color: Color(0xffB212CA),
+                            fontWeight: FontWeight.w300,
+                            decoration: TextDecoration.underline,
+                            decorationColor: Color(0xffB212CA),
+                            fontFamily: 'Readex_Pro'))),
+                Text(
+                  ' in: ',
+                  style: styleText(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w300,
+                    color: const Color(0xffB212CA),
+                  ),
+                ),
+                Text(
+                    "${remaining.minutes}: ${remaining.seconds}s",
+                    style: styleText(fontSize: 14.0))
+              ],
+            );
+          }),
+    );
+}
   ElevatedButton verifyAadhaarButton() {
     return ElevatedButton(
       onPressed: () {
         setState(() {
-          verifyAdhar = true;
+          verifyAadhaar = true;
         });
+        _controller.start();
         enterOtpBottomSheet();
       },
       style: OutlinedButton.styleFrom(
@@ -139,6 +229,32 @@ class _UploadPanState extends State<UploadPan> {
         padding: const EdgeInsets.symmetric(vertical: 15.0),
         child: Text(
           "Verify Aadhaar",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+
+  ElevatedButton confirmAndContinueButton() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          activeStep=1;
+
+        });
+        Navigator.pop(context);
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Confirm and Continue",
           style: styleText(
               color: Colors.white,
               fontSize: 16.0,
@@ -278,7 +394,7 @@ class _UploadPanState extends State<UploadPan> {
         children: [
           stepI(),
           Text(
-            '${activeStep == 0 ? 0 : (100 / (4 - activeStep)).round()}% completed',
+            '${activeStep == 0 ? 0 : (activeStep*35)}% completed',
             textAlign: TextAlign.start,
             style: styleText(
                 color: Colors.purple,
@@ -293,7 +409,37 @@ class _UploadPanState extends State<UploadPan> {
                 color: const Color(0xffFEF9FF),
                 borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Column(
+            child: activeStep==1? Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Enter GSTIN',style: styleText(color: const Color(0xff272727),fontSize: 18.0),),
+                  const SizedBox(height: 6,),
+                  Text('We require this to verify your business identity.',style: styleText(color: const Color(0xff676767),fontSize: 14.0,fontWeight: FontWeight.w300,),),
+                  const SizedBox(height: 36,),
+                  Text('GSTIN',style: styleText(fontSize: 16.0,fontWeight: FontWeight.w300),),
+                  const SizedBox(height: 8),
+                  Form(
+                    key: gstinFormKey,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        fillColor: Color(0xffFBEEFE),
+                        filled: true,
+                        hintText: 'BA34V F7K90',
+                        hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18.0)),
+                    validator: (value){
+    if (value == null || value.isEmpty) {
+    return 'No GSTIN found';
+    }
+    return null;
+    },
+
+                    ),
+                  )
+                ],
+              ),
+            ):Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Padding(
@@ -345,7 +491,7 @@ class _UploadPanState extends State<UploadPan> {
               ],
             ),
           ),
-          uploadButtonClick == true
+          uploadButtonClick == true && activeStep!=1
               ? Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 8.0),

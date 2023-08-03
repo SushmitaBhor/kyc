@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool check = false;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: SafeArea(child: completeKYC()));
+    return Scaffold(resizeToAvoidBottomInset:false,body: SafeArea(child: completeKYC()));
   }
 
   Widget completeKYC() {
