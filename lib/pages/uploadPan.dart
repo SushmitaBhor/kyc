@@ -287,7 +287,9 @@ class _UploadPanState extends State<UploadPan>
     );
   }
 openBankActivity(){
-    return showModalBottomSheet(context: context, builder: (BuildContext context){
+    return showModalBottomSheet(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        context: context, builder: (BuildContext context){
       return ListSearch();
     });
 }
