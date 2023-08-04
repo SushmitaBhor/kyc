@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pin_code_fields/flutter_pin_code_fields.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kyc/pages/searchListOfPrimaryBusinessActivity.dart';
 import 'package:kyc/pages/takeAPhoto.dart';
 import '../commomWidget.dart';
 import 'package:custom_timer/custom_timer.dart';
@@ -27,20 +28,26 @@ class _UploadPanState extends State<UploadPan>
       initialState: CustomTimerState.reset,
       interval: CustomTimerInterval.seconds);
 
-
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
+  TextEditingController companyNickNameController = TextEditingController();
   bool isLoad = false;
   bool isBrowse = false;
   bool uploadButtonClick = false;
+  bool companyNameError = false;
+  bool checkWebsite = false;
   bool verifyAadhaar = false;
+  bool continueAndConfirmClicked = false;
   bool verifyGSTIN = false;
+  bool confirmBankDetails = false;
   final cameras = availableCameras();
   FilePickerResult? result;
+  int _ratingController = 1;
+  int _gstinController = 1;
   late File file;
   @override
   Widget build(BuildContext context) {
@@ -51,8 +58,6 @@ class _UploadPanState extends State<UploadPan>
           ),
           body: SingleChildScrollView(
             child: Container(
-              width: double.maxFinite,
-              height: double.maxFinite,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
@@ -61,23 +66,38 @@ class _UploadPanState extends State<UploadPan>
                   ],
                 ),
               ),
-              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   upload(),
                   const SizedBox(height: 30),
-                  uploadButtonClick == true
-                      ? SizedBox(
-                          width: double.maxFinite, child: verifyAadhaarButton())
-                      :activeStep==1? verifyGSTINButton(): const SizedBox.shrink(),
-                  isLoad == true || widget.picture != null
-                      ? uploadButtonClick == true
-                          ? const SizedBox.shrink()
+                  continueAndConfirmClicked == true
+                      ? SizedBox(height: verifyGSTIN == true ? 30 : 150)
+                      : const SizedBox.shrink(),
+                  continueAndConfirmClicked == true
+                      ? verifyGSTIN == true
+                          ? SizedBox(
+                              width: double.maxFinite,
+                              child: confirmBankDetailsButton())
                           : SizedBox(
                               width: double.maxFinite,
-                              child: uploadPan(),
+                              child: verifyGSTINButton(),
                             )
-                      : benefit()
+                      : isLoad == true || widget.picture != null
+                          ? uploadButtonClick == true
+                              ? const SizedBox.shrink()
+                              : SizedBox(
+                                  width: double.maxFinite,
+                                  child: uploadPan(),
+                                )
+                          : benefit(),
+                  uploadButtonClick == true
+                      ? SizedBox(
+                          width: double.maxFinite,
+                          child: verifyAadhaarButton(),
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
             ),
@@ -88,7 +108,7 @@ class _UploadPanState extends State<UploadPan>
   enterOtpBottomSheet() {
     return showModalBottomSheet(
         context: context,
-        backgroundColor: Color(0xffFFFFFF),
+        backgroundColor: const Color(0xffFFFFFF),
         builder: (BuildContext context) {
           return SingleChildScrollView(
             child: Container(
@@ -143,9 +163,7 @@ class _UploadPanState extends State<UploadPan>
                         )),
                     resendOtpCounter(),
                     const SizedBox(height: 18),
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                       Text(
                         'Wrong Aadhaar Number? ',
                         style: styleText(
@@ -167,7 +185,9 @@ class _UploadPanState extends State<UploadPan>
                     const SizedBox(height: 48),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: SizedBox(width:double.maxFinite,child: confirmAndContinueButton()),
+                      child: SizedBox(
+                          width: double.maxFinite,
+                          child: confirmAndContinueButton()),
                     ),
                     const SizedBox(height: 43),
                   ],
@@ -175,7 +195,8 @@ class _UploadPanState extends State<UploadPan>
           );
         });
   }
-resendOtpCounter(){
+
+  resendOtpCounter() {
     return Padding(
       padding: const EdgeInsets.only(right: 18.0),
       child: CustomTimer(
@@ -205,19 +226,20 @@ resendOtpCounter(){
                     color: const Color(0xffB212CA),
                   ),
                 ),
-                Text(
-                    "${remaining.minutes}: ${remaining.seconds}s",
+                Text("${remaining.minutes}: ${remaining.seconds}s",
                     style: styleText(fontSize: 14.0))
               ],
             );
           }),
     );
-}
+  }
+
   ElevatedButton verifyAadhaarButton() {
     return ElevatedButton(
       onPressed: () {
         setState(() {
           verifyAadhaar = true;
+          uploadButtonClick = false;
         });
         _controller.start();
         enterOtpBottomSheet();
@@ -238,12 +260,55 @@ resendOtpCounter(){
       ),
     );
   }
+
   ElevatedButton verifyGSTINButton() {
     return ElevatedButton(
       onPressed: () {
-        setState(() {
-          verifyGSTIN = true;
-        });
+        if (gstinFormKey.currentState?.validate() == true) {
+          setState(() {
+            verifyGSTIN = true;
+          });
+        }
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Verify",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+openBankActivity(){
+    return showModalBottomSheet(context: context, builder: (BuildContext context){
+      return ListSearch();
+    });
+}
+  ElevatedButton confirmBankDetailsButton() {
+    return ElevatedButton(
+      onPressed: () {
+        if (bankFormKey.currentState!.validate() == true) {
+          setState(() {
+            confirmBankDetails = true;
+          });
+
+        }
+        if (companyNickNameController.text.isEmpty) {
+          setState(() {
+            companyNameError = !companyNameError;
+          });openBankActivity();
+        }else{
+          setState(() {
+            companyNameError = !companyNameError;
+          });
+        }
 
       },
       style: OutlinedButton.styleFrom(
@@ -253,7 +318,7 @@ resendOtpCounter(){
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15.0),
         child: Text(
-          "Verify Aadhaar",
+          "Confirm and Continue",
           style: styleText(
               color: Colors.white,
               fontSize: 16.0,
@@ -267,8 +332,8 @@ resendOtpCounter(){
     return ElevatedButton(
       onPressed: () {
         setState(() {
-          activeStep=1;
-
+          activeStep = 1;
+          continueAndConfirmClicked = true;
         });
         Navigator.pop(context);
       },
@@ -407,7 +472,7 @@ resendOtpCounter(){
 
   Widget upload() {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 24),
+      padding: const EdgeInsets.symmetric(vertical: 24),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -419,7 +484,7 @@ resendOtpCounter(){
         children: [
           stepI(),
           Text(
-            '${activeStep == 0 ? 0 : (activeStep*35)}% completed',
+            '${activeStep == 0 ? 0 : (activeStep * 35)}% completed',
             textAlign: TextAlign.start,
             style: styleText(
                 color: Colors.purple,
@@ -434,95 +499,363 @@ resendOtpCounter(){
                 color: const Color(0xffFEF9FF),
                 borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: activeStep==1? Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Enter GSTIN',style: styleText(color: const Color(0xff272727),fontSize: 18.0),),
-                  const SizedBox(height: 6,),
-                  Text('We require this to verify your business identity.',style: styleText(color: const Color(0xff676767),fontSize: 14.0,fontWeight: FontWeight.w300,),),
-                  const SizedBox(height: 36,),
-                  Text('GSTIN',style: styleText(fontSize: 16.0,fontWeight: FontWeight.w300),),
-                  const SizedBox(height: 8),
-                  Form(
-                    key: gstinFormKey,
-                    child: TextFormField(
-                      decoration: const InputDecoration(
-                        fillColor: Color(0xffFBEEFE),
-                        filled: true,
-                        hintText: 'BA34V F7K90',
-                        hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18.0)),
-                    validator: (value){
-    if (value == null || value.isEmpty) {
-    return 'No GSTIN found';
-    }
-    return null;
-    },
-
-                    ),
-                  )
-                ],
-              ),
-            ):Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Column(
+            child: activeStep == 1
+                ? verifyGSTIN == false
+                    ? enterGSTINForm()
+                    : fillBusinessDetailsForm()
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      titleAndDescription(),
-                      const SizedBox(
-                        height: 10,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Column(
+                          children: [
+                            titleAndDescription(),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            isBrowse == true
+                                ? dotBorderBoxBrowse()
+                                : dotBorderBox(),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       ),
-                      isBrowse == true ? dotBorderBoxBrowse() : dotBorderBox(),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      isLoad == true || widget.picture != null
+                          ? uploadButtonClick == true
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'To upload a different PAN',
+                                      textAlign: TextAlign.left,
+                                      style: styleText(
+                                          fontWeight: FontWeight.w300,
+                                          fontSize: 16.0,
+                                          color: const Color(0xff272727)),
+                                    ),
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            uploadButtonClick = false;
+                                          });
+                                        },
+                                        child: const Text(
+                                          'Click here',
+                                          style: TextStyle(
+                                              color: Color(0xffB212CA),
+                                              fontSize: 16.0,
+                                              fontWeight: FontWeight.w600,
+                                              decoration:
+                                                  TextDecoration.underline),
+                                        )),
+                                  ],
+                                )
+                              : const SizedBox.shrink()
+                          : verticalSteps()
                     ],
                   ),
-                ),
-                isLoad == true || widget.picture != null
-                    ? uploadButtonClick == true
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'To upload a different PAN',
-                                textAlign: TextAlign.left,
-                                style: styleText(
-                                    fontWeight: FontWeight.w300,
-                                    fontSize: 16.0,
-                                    color: const Color(0xff272727)),
-                              ),
-                              TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      uploadButtonClick = false;
-                                    });
-                                  },
-                                  child: const Text(
-                                    'Click here',
-                                    style: TextStyle(
-                                        color: Color(0xffB212CA),
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: TextDecoration.underline),
-                                  )),
-                            ],
-                          )
-                        : const SizedBox.shrink()
-                    : verticalSteps()
-              ],
-            ),
           ),
-          uploadButtonClick == true && activeStep!=1
+          uploadButtonClick == true && activeStep != 1
               ? Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 8.0),
                   child: form(),
                 )
               : const SizedBox.shrink(),
+        ],
+      ),
+    );
+  }
+
+  Widget enterGSTINForm() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Enter GSTIN',
+            style: styleText(color: const Color(0xff272727), fontSize: 18.0),
+          ),
+          const SizedBox(
+            height: 6,
+          ),
+          Text(
+            'We require this to verify your business identity.',
+            style: styleText(
+              color: const Color(0xff676767),
+              fontSize: 14.0,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+          const SizedBox(
+            height: 36,
+          ),
+          Text(
+            'GSTIN',
+            style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+          ),
+          const SizedBox(height: 8),
+          Form(
+            key: gstinFormKey,
+            child: TextFormField(
+              decoration: const InputDecoration(
+                  fillColor: Color(0xffFBEEFE),
+                  filled: true,
+                  hintText: 'BA34V F7K90',
+                  hintStyle:
+                      TextStyle(color: Color(0xffBBBBBB), fontSize: 18.0)),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'No GSTIN found';
+                }
+                return null;
+              },
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget fillBusinessDetailsForm() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('PAN Verified!',
+              style: styleText(
+                color: const Color(0xff08AC72),
+                fontSize: 18.0,
+              )),
+          Text(' Fill In Your Business Details',
+              style: styleText(
+                color: const Color(0xff272727),
+                fontSize: 18.0,
+              )),
+          const SizedBox(
+            height: 6,
+          ),
+          Text(
+            'We require this to verify your business identity.',
+            style: styleText(
+              color: const Color(0xff676767),
+              fontSize: 14.0,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+          Form(
+            key: bankFormKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'PAN',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText: 'BA34V F7K90',
+                      hintStyle:
+                          TextStyle(color: Color(0xff272727), fontSize: 16.0)),
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'Company name',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText: 'ABC Limited',
+                      hintStyle:
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'CIN',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText: 'U369900R2020PTC032608',
+                      hintStyle:
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'Company nickname for communications',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: companyNickNameController,
+                  decoration: const InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText: 'Enter Company nickname',
+                      hintStyle:
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                ),
+                companyNameError == true
+                    ? Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Color(0xffCC2C2C),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Enter Company nickname',
+                            style: styleText(
+                                color: const Color(0xffCC2C2C),
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w300),
+                          ),
+                        ],
+                      )
+                    : const SizedBox.shrink(),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'Primary business activity',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField(
+                  value: _ratingController,
+                  decoration: InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText: 'Select one',
+                      hintStyle: styleText(
+                          color: const Color(0xffBBBBBB),
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w300)),
+                  items: [1, 2, 3, 4, 5]
+                      .map((label) => DropdownMenuItem(
+                            value: label,
+                            child: Text(label.toString()),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _ratingController = value!;
+                    });
+                  },
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'GSTIN',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                DropdownButtonFormField(
+                  value: _gstinController,
+                  decoration: InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText: 'Select',
+                      hintStyle: styleText(
+                          color: const Color(0xffBBBBBB),
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w300)),
+                  items: [1, 2, 3, 4, 5]
+                      .map((label) => DropdownMenuItem(
+                            child: Text(label.toString()),
+                            value: label,
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      _ratingController = value!;
+                    });
+                  },
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'Billing address',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText:
+                          'A140, Near Maternity Care Hospital, Sahid Nagar, Bhubaneswar, Khordha, Odisha, 751007',
+                      hintStyle:
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Text(
+                  'Website URL',
+                  style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  decoration: const InputDecoration(
+                      fillColor: Color(0xffFBEEFE),
+                      filled: true,
+                      hintText:
+                          'A140, Near Maternity Care Hospital, Sahid Nagar, Bhubaneswar, Khordha, Odisha, 751007',
+                      hintStyle:
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                ),
+                const SizedBox(
+                  height: 36,
+                ),
+                Row(
+                  children: [
+                    Checkbox(
+                        value: checkWebsite,
+                        onChanged: (value) {
+                          setState(() {
+                            checkWebsite = value!;
+                          });
+                        }),
+                    const SizedBox(width: 6),
+                    Text(
+                      'We don\'t have a website',
+                      style: styleText(
+                          color: const Color(0xff272727),
+                          fontWeight: FontWeight.w300,
+                          fontSize: 14.0),
+                    )
+                  ],
+                )
+              ],
+            ),
+          )
         ],
       ),
     );

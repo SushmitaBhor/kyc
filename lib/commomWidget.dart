@@ -6,6 +6,7 @@ int
 
 activeStep = 0;
  GlobalKey<FormState> gstinFormKey=GlobalKey<FormState>();
+ GlobalKey<FormState> bankFormKey=GlobalKey<FormState>();
 final stepperList = [
   StepperStep(
       title: const Text(
