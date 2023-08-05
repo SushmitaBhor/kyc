@@ -63,7 +63,7 @@ TextStyle styleText({color, fontWeight, fontSize}) {
       fitWidth: true,
       activeStepBackgroundColor: Colors.purple,
       activeStepIconColor: Colors.white,
-      finishedStepBackgroundColor: Colors.grey.shade400,
+      finishedStepBackgroundColor: Color(0xff461AA3),
       finishedStepIconColor: Colors.grey,
       unreachedStepBackgroundColor: Colors.grey.shade100,
       unreachedStepIconColor: Colors.grey,

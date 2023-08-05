@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kyc/pages/selectNationalityList.dart';
 import 'dart:math' as math;
 import '../commonWidget.dart';
-
+bool addbeneficiary=false;
 class BeneficiaryOwnerForm extends StatefulWidget {
   const BeneficiaryOwnerForm({Key? key}) : super(key: key);
 
@@ -102,18 +102,18 @@ class _BeneficiaryOwnerFormState extends State<BeneficiaryOwnerForm> {
                 hintText: 'ATUL LAHOTI',
                 hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18)),
           ),
-          const SizedBox(
+          addbeneficiary==true?    const SizedBox(
             height: 73,
-          ),
-          Text('Add PAN Of Alternate Beneficial Owner/Director',
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?    Text('Add PAN Of Alternate Beneficial Owner/Director',
               style: styleText(
                 color: const Color(0xff272727),
                 fontSize: 18.0,
-              )),
-          const SizedBox(
+              )):const SizedBox.shrink(),
+          addbeneficiary==true?    const SizedBox(
             height: 6,
-          ),
-          TextFormField(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?    TextFormField(
             onTap: () {},
             decoration: InputDecoration(
                 fillColor: const Color(0xffFBEEFE),
@@ -130,56 +130,60 @@ class _BeneficiaryOwnerFormState extends State<BeneficiaryOwnerForm> {
                     color: const Color(0xffBBBBBB),
                     fontSize: 16.0,
                     fontWeight: FontWeight.w300)),
-          ),
-          const SizedBox(
+          ):const SizedBox.shrink(),
+         addbeneficiary==true? const SizedBox(
             height: 9,
-          ),
-          Text(
+          ):const SizedBox.shrink(),
+        addbeneficiary==true?  Text(
             'Please select one user',
             style: styleText(
               color: Color(0xff676767),
               fontSize: 14.0,
               fontWeight: FontWeight.w300,
             ),
-          ),
-          const SizedBox(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?   const SizedBox(
             height: 9,
-          ),
-          Text(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?    Text(
             'Choose alternate person from the list beneficial owners/directors entered above.',
             style: styleText(
               color: const Color(0xff272727B37),
               fontSize: 14.0,
               fontWeight: FontWeight.w300,
             ),
-          ),
-          Text(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?    Text(
             'Beneficial Owner/ Directors Name',
             style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
-          ),
-          Text(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?   Text(
             'ATUL LAHOTI\'s Personal PAN',
             style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
-          ),
-          const SizedBox(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?    const SizedBox(
             height: 8,
-          ),
-          TextFormField(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true?    TextFormField(
             decoration: const InputDecoration(
                 fillColor: Color(0xffFBEEFE),
                 filled: true,
                 hintText: 'HEMANT KUMAR GHIYA',
                 hintStyle: TextStyle(color: Color(0xff272727), fontSize: 18.0)),
-          ),
-          const SizedBox(
+          ):const SizedBox.shrink(),
+          addbeneficiary==true? const SizedBox.shrink(): const SizedBox(
             height: 36,
           ),
-          SizedBox(width: double.maxFinite,
-            child: OutlinedButton(onPressed: (){},style: OutlinedButton.styleFrom(shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+          addbeneficiary==true? const SizedBox.shrink():  SizedBox(width: double.maxFinite,
+            child: OutlinedButton(onPressed: (){
+              setState(() {
+                addbeneficiary=true;
+              });
+            },style: OutlinedButton.styleFrom(shape:RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                 side: const BorderSide(color: Color(0xff461AA3))
                 ), child: Text('+ Add New Beneficial Owner',style: styleText(color: const Color(0xff461AA3),fontSize: 16.0),)),
           ),
-          const SizedBox(
+          addbeneficiary==true? const SizedBox.shrink():const SizedBox(
             height: 17,
           ),
           Row(

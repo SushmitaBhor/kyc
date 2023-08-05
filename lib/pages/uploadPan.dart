@@ -87,11 +87,11 @@ class _UploadPanState extends State<UploadPan>
                           ? SizedBox(
                               width: double.maxFinite,
                               child: submitAndContinueButton())
-                          : isSubmitAndContinue == true
-                              ? SizedBox(
+                          : isSubmitAndContinue == true && isSubmitAndContinueNext==false
+                              ?   SizedBox(
                                   width: double.maxFinite,
                                   child: submitAndContinueNextButton())
-                              : const SizedBox.shrink()
+                              :const SizedBox.shrink()
                       : continueAndConfirmClicked == true
                           ? verifyGSTIN == true
                               ? SizedBox(
@@ -421,8 +421,9 @@ class _UploadPanState extends State<UploadPan>
       onPressed: () {
         setState(() {
           isSubmitAndContinueNext = true;
-          activeStep = 3;
+          activeStep = 4;
           isSubmitAndContinueDone = true;
+          isSubmitAndContinue = false;
         });
       },
       style: OutlinedButton.styleFrom(
@@ -484,7 +485,7 @@ class _UploadPanState extends State<UploadPan>
         children: [
           stepI(),
           Text(
-            '${activeStep == 0 ? 0 : activeStep==2?70:activeStep==3?90:35}% completed',
+            '${activeStep == 0 ? 0 : activeStep==1?35:activeStep==2?70:activeStep==3?90:activeStep==4?100:isSubmitAndContinueNext==true?90:100}% completed',
             textAlign: TextAlign.start,
             style: styleText(
                 color: Colors.purple,
