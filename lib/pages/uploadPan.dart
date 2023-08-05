@@ -11,7 +11,8 @@ import 'package:kyc/pages/searchListOfPrimaryBusinessActivity.dart';
 import 'package:kyc/pages/takeAPhoto.dart';
 import '../commomWidget.dart';
 import 'package:custom_timer/custom_timer.dart';
-
+import 'dart:math' as math;
+TextEditingController primaryActivityController = TextEditingController();
 class UploadPan extends StatefulWidget {
   UploadPan({Key? key, this.picture}) : super(key: key);
   XFile? picture;
@@ -35,6 +36,7 @@ class _UploadPanState extends State<UploadPan>
   }
 
   TextEditingController companyNickNameController = TextEditingController();
+
   bool isLoad = false;
   bool isBrowse = false;
   bool uploadButtonClick = false;
@@ -304,7 +306,7 @@ openBankActivity(){
         if (companyNickNameController.text.isEmpty) {
           setState(() {
             companyNameError = !companyNameError;
-          });openBankActivity();
+          });
         }else{
           setState(() {
             companyNameError = !companyNameError;
@@ -745,27 +747,21 @@ openBankActivity(){
                   style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
                 ),
                 const SizedBox(height: 8),
-                DropdownButtonFormField(
-                  value: _ratingController,
-                  decoration: InputDecoration(
-                      fillColor: Color(0xffFBEEFE),
-                      filled: true,
-                      hintText: 'Select one',
-                      hintStyle: styleText(
-                          color: const Color(0xffBBBBBB),
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w300)),
-                  items: [1, 2, 3, 4, 5]
-                      .map((label) => DropdownMenuItem(
-                            value: label,
-                            child: Text(label.toString()),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _ratingController = value!;
-                    });
-                  },
+                TextFormField(onTap: (){
+                  openBankActivity();
+
+                },
+controller: primaryActivityController,
+                decoration: InputDecoration(
+
+                    fillColor: const Color(0xffFBEEFE),
+                    filled: true,
+                    hintText: 'Select one',suffixIcon:  Transform.rotate( angle: 90 * math.pi / 180,
+                    child: Icon(Icons.arrow_forward_ios_sharp,color: Color(0xff272727),size: 12,)),
+                    hintStyle: styleText(
+                        color: const Color(0xffBBBBBB),
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w300)),
                 ),
                 const SizedBox(
                   height: 36,

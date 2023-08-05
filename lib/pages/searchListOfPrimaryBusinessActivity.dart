@@ -1,36 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kyc/commomWidget.dart';
+import 'package:custom_radio_group_list/custom_radio_group_list.dart';
+import 'package:kyc/pages/uploadPan.dart';
 
 class ListSearch extends StatefulWidget {
   ListSearchState createState() => ListSearchState();
 }
+TextEditingController _textController = TextEditingController();
 
+ List<String> mainDataList = [
+  "Accounting",
+  "Administrative Services (Payroll, HR, virtual assistants, back office, etc)",
+  "Architecture & Civil Planning",
+  "Education services",
+  "Financial services",
+  "Leisure, Travel & Tourism",
+  "Manufacturing/ Goods exports",
+  "Public Relations and Communications",
+  "Research & analytics services",
+  "Staffing & Recruiting",
+  "Other",
+
+];
+
+// Copy Main List into New List.
+List<String> newDataList = List.from(mainDataList);
+bool _isRadioSelected = false;
 class ListSearchState extends State<ListSearch> {
-  TextEditingController _textController = TextEditingController();
 
-  static List<String> mainDataList = [
-    "Accounting",
-    "Administrative Services (Payroll, HR, virtual assistants, back office, etc)",
-    "Architecture & Civil Planning",
-    "Education services",
-    "Financial services",
-    "Leisure, Travel & Tourism",
-    "Manufacturing/ Goods exports",
-    "Public Relations and Communications",
-    "Research & analytics services",
-    "Staffing & Recruiting",
-    "Other",
 
-  ];
-
-  // Copy Main List into New List.
-  List<String> newDataList = List.from(mainDataList);
-  bool _isRadioSelected = false;
-  bool _activity = true;
 
   onItemChanged(String value) {
+
     setState(() {
+
       newDataList = mainDataList
           .where((string) => string.toLowerCase().contains(value.toLowerCase()))
           .toList();
@@ -86,30 +90,21 @@ border: OutlineInputBorder(borderSide: BorderSide(color: Color(0xffF3F3F3))),
                 fillColor: const Color(0xffFBEEFE)),
             onChanged: onItemChanged,
           ),
-          Expanded(
-            child: ListView(
 
-              children: newDataList.map((data) {
-                return Column(
-                  children: [
-                    RadioListTile(
-                      title: Text(data),selected: _isRadioSelected==_activity,
-                      controlAffinity: ListTileControlAffinity.trailing,contentPadding: EdgeInsets.zero,
-                      value: _activity,
-                      groupValue: _isRadioSelected,
-                      onChanged: (bool? value) {
-                        print(data);
-                        setState(() {
-                          _isRadioSelected = value!;
-                        });
-                      },
-                    ),
-                    Container(color: Color(0xffCCCCCC),height: 0.5,)
-                  ],
-                );
-              }).toList(),
+
+          Expanded(
+            child: SizedBox(height: MediaQuery.of(context).size.height,
+              child: RadioGroup(
+                  items: newDataList,
+                  selectedItem: _isRadioSelected,
+                  onChanged: (value) {
+                    primaryActivityController.text=value;
+                  },
+                  disabled: false, labelBuilder: (BuildContext context , int index ) { return Text(newDataList[index]); },),
             ),
           )
+
+
         ],
       ),
     );
