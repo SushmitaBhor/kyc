@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kyc/commomWidget.dart';
+import 'package:kyc/commonWidget.dart';
 import 'package:custom_radio_group_list/custom_radio_group_list.dart';
-import 'package:kyc/pages/uploadPan.dart';
+import 'businessDetailsForm.dart';
 
 class ListSearch extends StatefulWidget {
   ListSearchState createState() => ListSearchState();

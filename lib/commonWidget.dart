@@ -99,11 +99,12 @@ TextStyle styleText({color, fontWeight, fontSize}) {
 }
 Decoration decoration() {
   return BoxDecoration(
-      color: Colors.purple.shade50,
+      color: const Color(0xffF8E9FA),
       borderRadius: BorderRadius.circular(16),
-      boxShadow: [
+      boxShadow: const [
+        BoxShadow(),
         BoxShadow(
-            color: Colors.grey.shade300, spreadRadius: 1, blurRadius: 20),
+            color: Color(0xff00000029),blurRadius: 6),
       ]);
 }
 Widget leadIcon() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kyc/pages/uploadPan.dart';
 
-import 'commomWidget.dart';
+import 'commonWidget.dart';
 
 Future<void> main() async {
   runApp(MyApp());
@@ -255,7 +255,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return Container(width: double.infinity,margin: const EdgeInsets.all(20),
       child: ElevatedButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){return UploadPan();}));
+          if(check==true) {
+            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context){return UploadPan();}));
+          }
         },
         style: OutlinedButton.styleFrom(backgroundColor: Colors.deepPurple,shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),padding: EdgeInsets.symmetric(vertical: 10)),
         child: Text(
