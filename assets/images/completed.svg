@@ -1,0 +1,7 @@
+<svg id="lock" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="Ellipse_33" data-name="Ellipse 33" fill="none" stroke="#08ac72" stroke-width="1">
+    <circle cx="12" cy="12" r="12" stroke="none"/>
+    <circle cx="12" cy="12" r="11.5" fill="none"/>
+  </g>
+  <path id="check" d="M13.6,6,7,12.6l-3-3" transform="translate(4.067 2.7)" fill="none" stroke="#08ac72" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+</svg>

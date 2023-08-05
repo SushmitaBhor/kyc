@@ -3,11 +3,13 @@ import 'package:kyc/pages/searchListOfPrimaryBusinessActivity.dart';
 import 'package:kyc/pages/selectGSTIN.dart';
 import 'dart:math' as math;
 import '../commonWidget.dart';
+
 TextEditingController primaryActivityController = TextEditingController();
 TextEditingController gstinController = TextEditingController();
 TextEditingController companyNickNameController = TextEditingController();
 bool checkWebsite = false;
 bool companyNameError = false;
+
 class BusinessDetailsForm extends StatefulWidget {
   const BusinessDetailsForm({Key? key}) : super(key: key);
 
@@ -16,26 +18,30 @@ class BusinessDetailsForm extends StatefulWidget {
 }
 
 class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
-  openBankActivity(){
+  openBankActivity() {
     return showModalBottomSheet(
-        context: context, builder: (BuildContext context){
-      return ListSearch();
-    });
+        context: context,
+        builder: (BuildContext context) {
+          return ListSearch();
+        });
   }
-  openGSTIN(){
+
+  openGSTIN() {
     return showModalBottomSheet(
-        context: context, builder: (BuildContext context){
-      return SelectGSTIN();
-    });
+        context: context,
+        builder: (BuildContext context) {
+          return const SelectGSTIN();
+        });
   }
+
   @override
   Widget build(BuildContext context) {
     return fillBusinessDetailsForm();
   }
-  Widget fillBusinessDetailsForm() {
 
+  Widget fillBusinessDetailsForm() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -79,7 +85,7 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                       filled: true,
                       hintText: 'BA34V F7K90',
                       hintStyle:
-                      TextStyle(color: Color(0xff272727), fontSize: 16.0)),
+                          TextStyle(color: Color(0xff272727), fontSize: 16.0)),
                 ),
                 const SizedBox(
                   height: 36,
@@ -95,7 +101,7 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                       filled: true,
                       hintText: 'ABC Limited',
                       hintStyle:
-                      TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
                 ),
                 const SizedBox(
                   height: 36,
@@ -111,7 +117,7 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                       filled: true,
                       hintText: 'U369900R2020PTC032608',
                       hintStyle:
-                      TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
                 ),
                 const SizedBox(
                   height: 36,
@@ -128,25 +134,25 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                       filled: true,
                       hintText: 'Enter Company nickname',
                       hintStyle:
-                      TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
                 ),
                 companyNameError == true
                     ? Row(
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      color: Color(0xffCC2C2C),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Enter Company nickname',
-                      style: styleText(
-                          color: const Color(0xffCC2C2C),
-                          fontSize: 12.0,
-                          fontWeight: FontWeight.w300),
-                    ),
-                  ],
-                )
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Color(0xffCC2C2C),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Enter Company nickname',
+                            style: styleText(
+                                color: const Color(0xffCC2C2C),
+                                fontSize: 12.0,
+                                fontWeight: FontWeight.w300),
+                          ),
+                        ],
+                      )
                     : const SizedBox.shrink(),
                 const SizedBox(
                   height: 36,
@@ -156,17 +162,22 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                   style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
                 ),
                 const SizedBox(height: 8),
-                TextFormField(onTap: (){
-                  openBankActivity();
-
-                },
+                TextFormField(
+                  onTap: () {
+                    openBankActivity();
+                  },
                   controller: primaryActivityController,
                   decoration: InputDecoration(
-
                       fillColor: const Color(0xffFBEEFE),
                       filled: true,
-                      hintText: 'Select one',suffixIcon:  Transform.rotate( angle: 90 * math.pi / 180,
-                      child: const Icon(Icons.arrow_forward_ios_sharp,color: Color(0xff272727),size: 12,)),
+                      hintText: 'Select one',
+                      suffixIcon: Transform.rotate(
+                          angle: 90 * math.pi / 180,
+                          child: const Icon(
+                            Icons.arrow_forward_ios_sharp,
+                            color: Color(0xff272727),
+                            size: 12,
+                          )),
                       hintStyle: styleText(
                           color: const Color(0xffBBBBBB),
                           fontSize: 16.0,
@@ -180,23 +191,27 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                   style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
                 ),
                 const SizedBox(height: 8),
-                TextFormField(onTap: (){
-                  openGSTIN();
-
-                },
+                TextFormField(
+                  onTap: () {
+                    openGSTIN();
+                  },
                   controller: gstinController,
                   decoration: InputDecoration(
-
                       fillColor: const Color(0xffFBEEFE),
                       filled: true,
-                      hintText: 'Select',suffixIcon:  Transform.rotate( angle: 90 * math.pi / 180,
-                      child: Icon(Icons.arrow_forward_ios_sharp,color: Color(0xff272727),size: 12,)),
+                      hintText: 'Select',
+                      suffixIcon: Transform.rotate(
+                          angle: 90 * math.pi / 180,
+                          child: const Icon(
+                            Icons.arrow_forward_ios_sharp,
+                            color: Color(0xff272727),
+                            size: 12,
+                          )),
                       hintStyle: styleText(
                           color: const Color(0xffBBBBBB),
                           fontSize: 16.0,
                           fontWeight: FontWeight.w300)),
                 ),
-
                 const SizedBox(
                   height: 36,
                 ),
@@ -211,9 +226,9 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                       fillColor: Color(0xffFBEEFE),
                       filled: true,
                       hintText:
-                      'A140, Near Maternity Care Hospital, Sahid Nagar, Bhubaneswar, Khordha, Odisha, 751007',
+                          'A140, Near Maternity Care Hospital, Sahid Nagar, Bhubaneswar, Khordha, Odisha, 751007',
                       hintStyle:
-                      TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
                 ),
                 const SizedBox(
                   height: 36,
@@ -228,9 +243,9 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
                       fillColor: Color(0xffFBEEFE),
                       filled: true,
                       hintText:
-                      'A140, Near Maternity Care Hospital, Sahid Nagar, Bhubaneswar, Khordha, Odisha, 751007',
+                          'A140, Near Maternity Care Hospital, Sahid Nagar, Bhubaneswar, Khordha, Odisha, 751007',
                       hintStyle:
-                      TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
+                          TextStyle(color: Color(0xffBBBBBB), fontSize: 16.0)),
                 ),
                 const SizedBox(
                   height: 36,
@@ -262,4 +277,3 @@ class _BusinessDetailsFormState extends State<BusinessDetailsForm> {
     );
   }
 }
-

@@ -6,11 +6,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_pin_code_fields/flutter_pin_code_fields.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kyc/pages/aadhaarAndPanForm.dart';
 import 'package:kyc/pages/businessDetailsForm.dart';
+import 'package:kyc/pages/enterGSTINForm.dart';
 import 'package:kyc/pages/takeAPhoto.dart';
 import '../commonWidget.dart';
 import 'package:custom_timer/custom_timer.dart';
-import 'dart:math' as math;
+
+import 'beneficiaryOwnerForm.dart';
+import 'businessBankAccountDetails.dart';
 
 class UploadPan extends StatefulWidget {
   UploadPan({Key? key, this.picture}) : super(key: key);
@@ -18,6 +22,11 @@ class UploadPan extends StatefulWidget {
   @override
   State<UploadPan> createState() => _UploadPanState();
 }
+
+bool isSubmitAndContinue = false;
+bool confirmBankDetails = false;
+bool isSubmitAndContinueNext = false;
+bool isSubmitAndContinueDone = false;
 
 class _UploadPanState extends State<UploadPan>
     with SingleTickerProviderStateMixin {
@@ -35,14 +44,14 @@ class _UploadPanState extends State<UploadPan>
   }
 
   TextEditingController companyNickNameController = TextEditingController();
-
   bool isLoad = false;
   bool isBrowse = false;
   bool uploadButtonClick = false;
+
   bool verifyAadhaar = false;
   bool continueAndConfirmClicked = false;
   bool verifyGSTIN = false;
-  bool confirmBankDetails = false;
+
   final cameras = availableCameras();
   FilePickerResult? result;
 
@@ -73,23 +82,33 @@ class _UploadPanState extends State<UploadPan>
                   continueAndConfirmClicked == true
                       ? SizedBox(height: verifyGSTIN == true ? 30 : 150)
                       : const SizedBox.shrink(),
-                  continueAndConfirmClicked == true
-                      ? verifyGSTIN == true
+                  activeStep == 2
+                      ? confirmBankDetails == true
                           ? SizedBox(
                               width: double.maxFinite,
-                              child: confirmBankDetailsButton())
-                          : SizedBox(
-                              width: double.maxFinite,
-                              child: verifyGSTINButton(),
-                            )
-                      : isLoad == true || widget.picture != null
-                          ? uploadButtonClick == true
-                              ? const SizedBox.shrink()
+                              child: submitAndContinueButton())
+                          : isSubmitAndContinue == true
+                              ? SizedBox(
+                                  width: double.maxFinite,
+                                  child: submitAndContinueNextButton())
+                              : const SizedBox.shrink()
+                      : continueAndConfirmClicked == true
+                          ? verifyGSTIN == true
+                              ? SizedBox(
+                                  width: double.maxFinite,
+                                  child: confirmBankDetailsButton())
                               : SizedBox(
                                   width: double.maxFinite,
-                                  child: uploadPan(),
+                                  child: verifyGSTINButton(),
                                 )
-                          : benefit(),
+                          : isLoad == true || widget.picture != null
+                              ? uploadButtonClick == true
+                                  ? const SizedBox.shrink()
+                                  : SizedBox(
+                                      width: double.maxFinite,
+                                      child: uploadPan(),
+                                    )
+                              : benefit(),
                   uploadButtonClick == true
                       ? SizedBox(
                           width: double.maxFinite,
@@ -288,22 +307,22 @@ class _UploadPanState extends State<UploadPan>
   ElevatedButton confirmBankDetailsButton() {
     return ElevatedButton(
       onPressed: () {
-        if (bankFormKey.currentState!.validate() == true) {
+        if (bankFormKey.currentState?.validate() == true) {
+          activeStep = 2;
+
           setState(() {
             confirmBankDetails = true;
           });
-
         }
         if (companyNickNameController.text.isEmpty) {
           setState(() {
             companyNameError = !companyNameError;
           });
-        }else{
+        } else {
           setState(() {
             companyNameError = !companyNameError;
           });
         }
-
       },
       style: OutlinedButton.styleFrom(
           backgroundColor: const Color(0xff461AA3),
@@ -372,70 +391,57 @@ class _UploadPanState extends State<UploadPan>
     );
   }
 
-  form() {
-    return Form(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('PAN',
-            style: styleText(
-                color: const Color(0xff272727),
-                fontSize: 16.0,
-                fontWeight: FontWeight.w300)),
-        const SizedBox(height: 8),
-        TextFormField(
-          decoration: const InputDecoration(
-              fillColor: Color(0xffFBEEFE),
-              filled: true,
-              hintText: 'BA34V F7K90',
-              hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18)),
+  ElevatedButton submitAndContinueButton() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          isSubmitAndContinue = true;
+          confirmBankDetails=false;
+        });
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Submit and Continue",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
         ),
-        const SizedBox(height: 24),
-        Text('Full Name',
-            style: styleText(
-                color: const Color(0xff272727),
-                fontSize: 16.0,
-                fontWeight: FontWeight.w300)),
-        const SizedBox(height: 8),
-        TextFormField(
-          decoration: const InputDecoration(
-              fillColor: Color(0xffFBEEFE),
-              filled: true,
-              hintText: 'HEMANT KUMAR GHIYA',
-              hintStyle: TextStyle(color: Color(0xffBBBBBB), fontSize: 18)),
-        ),
-        const SizedBox(height: 24),
-        Text('How Can We Address You?',
-            style: styleText(
-                color: const Color(0xff272727),
-                fontSize: 16.0,
-                fontWeight: FontWeight.w300)),
-        const SizedBox(height: 8),
-        TextFormField(
-          decoration: InputDecoration(
-              fillColor: const Color(0xffFBEEFE),
-              filled: true,
-              hintText: 'Hemant Kumar',
-              hintStyle:
-                  styleText(fontSize: 18.0, color: const Color(0xff272727))),
-        ),
-        const SizedBox(height: 24),
-        Text('Aadhaar Card',
-            style: styleText(
-                color: const Color(0xff272727),
-                fontSize: 16.0,
-                fontWeight: FontWeight.w300)),
-        TextFormField(
-          decoration: InputDecoration(
-              fillColor: const Color(0xffFBEEFE),
-              filled: true,
-              hintText: '1234 5678 9012',
-              hintStyle:
-                  styleText(fontSize: 18.0, color: const Color(0xff272727))),
-        ),
-      ]),
+      ),
     );
   }
 
-  int activeStepVertical = 0;
+  ElevatedButton submitAndContinueNextButton() {
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          isSubmitAndContinueNext = true;
+          activeStep = 3;
+          isSubmitAndContinueDone = true;
+        });
+      },
+      style: OutlinedButton.styleFrom(
+          backgroundColor: const Color(0xff461AA3),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(6))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 15.0),
+        child: Text(
+          "Submit and Continue",
+          style: styleText(
+              color: Colors.white,
+              fontSize: 16.0,
+              fontWeight: FontWeight.normal),
+        ),
+      ),
+    );
+  }
+
   browseImage() async {
     setState(() {});
     result = await FilePicker.platform
@@ -478,7 +484,7 @@ class _UploadPanState extends State<UploadPan>
         children: [
           stepI(),
           Text(
-            '${activeStep == 0 ? 0 : (activeStep * 35)}% completed',
+            '${activeStep == 0 ? 0 : activeStep==2?70:activeStep==3?90:35}% completed',
             textAlign: TextAlign.start,
             style: styleText(
                 color: Colors.purple,
@@ -488,128 +494,200 @@ class _UploadPanState extends State<UploadPan>
           const SizedBox(
             height: 10,
           ),
-          Container(
-            decoration: BoxDecoration(
-                color: const Color(0xffFEF9FF),
-                borderRadius: BorderRadius.circular(10)),
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: activeStep == 1
-                ? verifyGSTIN == false
-                    ? enterGSTINForm()
-                    : BusinessDetailsForm()
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: Column(
+          isSubmitAndContinueDone == true
+              ? Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 13.0,vertical: 5),
+                    child: SvgPicture.asset('assets/images/success.svg'),
+                  ),
+                  const SizedBox(
+                    height: 34,
+                  ),
+                  Text(
+                    'Thank You,',
+                    style: styleText(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 24.0,
+                        color: Color(0xff27272727)),
+                  ),
+                  Text(
+                    'Hemant Kumar!',
+                    style: styleText(
+                        fontSize: 32.0,
+                        color: Color(0xffB212CA),
+                        fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(
+                    height: 9,
+                  ),
+                  SizedBox(
+                      width: 170,
+                      child: Text(
+                        'Your KYC details are submitted successfully',
+                        textAlign: TextAlign.center,
+                        style: styleText(
+                            color: Color(0xff676767),
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16.0),
+                      )),
+                  const SizedBox(
+                    height: 34,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Have any queries?',
+                          style: styleText(
+                              fontSize: 16.0, color: Color(0xff272727)),
+                        ),
+                        Text(
+                          'Reach out to us, our customer support team will assist you.',
+                          style: styleText(
+                              color: Color(0xff272727B3),
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.w300),
+                        ),
+                        const SizedBox(
+                          height: 24,
+                        ),
+                        Row(
                           children: [
-                            titleAndDescription(),
-                            const SizedBox(
-                              height: 10,
+                            SvgPicture.asset(
+                              'assets/images/mailIcon.svg',
+                              height: 22,
+                              width: 22,
                             ),
-                            isBrowse == true
-                                ? dotBorderBoxBrowse()
-                                : dotBorderBox(),
                             const SizedBox(
-                              height: 10,
+                              width: 8,
                             ),
+                            Text('support@briskpe.com',
+                                style: styleText(
+                                    fontSize: 12.0,
+                                    color: Color(0xff272727))),
                           ],
                         ),
-                      ),
-                      isLoad == true || widget.picture != null
-                          ? uploadButtonClick == true
-                              ? Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'To upload a different PAN',
-                                      textAlign: TextAlign.left,
-                                      style: styleText(
-                                          fontWeight: FontWeight.w300,
-                                          fontSize: 16.0,
-                                          color: const Color(0xff272727)),
-                                    ),
-                                    TextButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            uploadButtonClick = false;
-                                          });
-                                        },
-                                        child: const Text(
-                                          'Click here',
-                                          style: TextStyle(
-                                              color: Color(0xffB212CA),
-                                              fontSize: 16.0,
-                                              fontWeight: FontWeight.w600,
-                                              decoration:
-                                                  TextDecoration.underline),
-                                        )),
-                                  ],
-                                )
-                              : const SizedBox.shrink()
-                          : verticalSteps()
-                    ],
+                        const SizedBox(
+                          height: 14,
+                        ),
+                        Row(
+                          children: [
+                            SvgPicture.asset(
+                              'aassets/images/whatsappIcon.svg',
+                              height: 22,
+                              width: 22,
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              '+91- 123 456 7890',
+                              style: styleText(
+                                  fontSize: 12.0, color: Color(0xff272727)),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
                   ),
-          ),
-          uploadButtonClick == true && activeStep != 1
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12.0, vertical: 8.0),
-                  child: form(),
-                )
-              : const SizedBox.shrink(),
-        ],
-      ),
-    );
-  }
+                ],
+              )
+              : Column(
+                  children: [
 
-  Widget enterGSTINForm() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Enter GSTIN',
-            style: styleText(color: const Color(0xff272727), fontSize: 18.0),
-          ),
-          const SizedBox(
-            height: 6,
-          ),
-          Text(
-            'We require this to verify your business identity.',
-            style: styleText(
-              color: const Color(0xff676767),
-              fontSize: 14.0,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-          const SizedBox(
-            height: 36,
-          ),
-          Text(
-            'GSTIN',
-            style: styleText(fontSize: 16.0, fontWeight: FontWeight.w300),
-          ),
-          const SizedBox(height: 8),
-          Form(
-            key: gstinFormKey,
-            child: TextFormField(
-              decoration: const InputDecoration(
-                  fillColor: Color(0xffFBEEFE),
-                  filled: true,
-                  hintText: 'BA34V F7K90',
-                  hintStyle:
-                      TextStyle(color: Color(0xffBBBBBB), fontSize: 18.0)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'No GSTIN found';
-                }
-                return null;
-              },
-            ),
-          )
+                    Container(
+                      decoration: BoxDecoration(
+                          color: const Color(0xffFEF9FF),
+                          borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: isSubmitAndContinue == true
+                          ? const BusinessBankAccountForm()
+                          : activeStep == 2
+                              ? bankFormKey.currentState?.validate() == true
+                                  ? const BeneficiaryOwnerForm()
+                                  : const SizedBox.shrink()
+                              : activeStep == 1
+                                  ? verifyGSTIN == false
+                                      ? const EnterGSTIN()
+                                      : const BusinessDetailsForm()
+                                  : Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12.0),
+                                          child: Column(
+                                            children: [
+                                              titleAndDescription(),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              isBrowse == true
+                                                  ? dotBorderBoxBrowse()
+                                                  : dotBorderBox(),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        isLoad == true || widget.picture != null
+                                            ? uploadButtonClick == true
+                                                ? Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Text(
+                                                        'To upload a different PAN',
+                                                        textAlign:
+                                                            TextAlign.left,
+                                                        style: styleText(
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                            fontSize: 16.0,
+                                                            color: const Color(
+                                                                0xff272727)),
+                                                      ),
+                                                      TextButton(
+                                                          onPressed: () {
+                                                            setState(() {
+                                                              uploadButtonClick =
+                                                                  false;
+                                                            });
+                                                          },
+                                                          child: const Text(
+                                                            'Click here',
+                                                            style: TextStyle(
+                                                                color: Color(
+                                                                    0xffB212CA),
+                                                                fontSize: 16.0,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                decoration:
+                                                                    TextDecoration
+                                                                        .underline),
+                                                          )),
+                                                    ],
+                                                  )
+                                                : const SizedBox.shrink()
+                                            : verticalSteps()
+                                      ],
+                                    ),
+                    ),
+                    uploadButtonClick == true && activeStep != 1
+                        ? const Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 8.0),
+                            child: PANAndAadhaarForm(),
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                )
         ],
       ),
     );
@@ -793,7 +871,7 @@ class _UploadPanState extends State<UploadPan>
                       result = null;
                     });
                   },
-                  child: Text(
+                  child: const Text(
                     'Remove',
                     style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
                   )),
@@ -805,15 +883,15 @@ class _UploadPanState extends State<UploadPan>
                       browseImage();
                     }
                   },
-                  child: const Text(
-                    'Change',
-                    style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
-                  ),
                   style: OutlinedButton.styleFrom(
                       backgroundColor: Colors.transparent,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(5),
-                          side: BorderSide(color: Color(0xff461AA3)))))
+                          side: const BorderSide(color: Color(0xff461AA3)))),
+                  child: const Text(
+                    'Change',
+                    style: TextStyle(fontSize: 12, color: Color(0xff461AA3)),
+                  ))
             ],
           ),
         )
@@ -836,7 +914,7 @@ class _UploadPanState extends State<UploadPan>
             style: styleText(
                 fontWeight: FontWeight.normal,
                 fontSize: 14.0,
-                color: Color(0xff272727))),
+                color: const Color(0xff272727))),
         const SizedBox(
           height: 10,
         ),

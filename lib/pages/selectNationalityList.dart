@@ -2,35 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kyc/commonWidget.dart';
 import 'package:custom_radio_group_list/custom_radio_group_list.dart';
-import 'businessDetailsForm.dart';
+import 'beneficiaryOwnerForm.dart';
 
-class ListSearch extends StatefulWidget {
-  ListSearchState createState() => ListSearchState();
+class SelectNationalityListSearch extends StatefulWidget {
+  SelectNationalityListSearchState createState() =>
+      SelectNationalityListSearchState();
 }
 
 TextEditingController _textController = TextEditingController();
 
-List<String> mainDataList = [
-  "Accounting",
-  "Administrative Services (Payroll, HR, virtual assistants, back office, etc)",
-  "Architecture & Civil Planning",
-  "Education services",
-  "Financial services",
-  "Leisure, Travel & Tourism",
-  "Manufacturing/ Goods exports",
-  "Public Relations and Communications",
-  "Research & analytics services",
-  "Staffing & Recruiting",
-  "Other",
+List<String> nationList = [
+  "Afghanistan",
+  "Albania",
+  "Algeria",
+  "Argentina",
+  "Armenia",
+  "Australia",
+  "Austria",
+  "Bangladesh",
+  "Belgium",
 ];
 
-List<String> newDataList = List.from(mainDataList);
+List<String> newDataList = List.from(nationList);
 bool _isRadioSelected = false;
 
-class ListSearchState extends State<ListSearch> {
+class SelectNationalityListSearchState
+    extends State<SelectNationalityListSearch> {
   onItemChanged(String value) {
     setState(() {
-      newDataList = mainDataList
+      newDataList = nationList
           .where((string) => string.toLowerCase().contains(value.toLowerCase()))
           .toList();
     });
@@ -77,7 +77,7 @@ class ListSearchState extends State<ListSearch> {
                 fontWeight: FontWeight.w300,
                 fontSize: 16.0),
             decoration: InputDecoration(
-                border: const OutlineInputBorder(
+                border: OutlineInputBorder(
                     borderSide: BorderSide(color: Color(0xffF3F3F3))),
                 contentPadding: EdgeInsets.only(left: 20),
                 suffixIcon: Row(
@@ -109,7 +109,7 @@ class ListSearchState extends State<ListSearch> {
                 items: newDataList,
                 selectedItem: _isRadioSelected,
                 onChanged: (value) {
-                  primaryActivityController.text = value;
+                  selectNationalityController.text = value;
                 },
                 disabled: false,
                 labelBuilder: (BuildContext context, int index) {
